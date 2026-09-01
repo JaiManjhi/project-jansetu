@@ -20,6 +20,10 @@ Citizen (PWA) ──submit──▶ Next.js API route ──▶ AI classify + em
 
 ## 3. Tech stack
 
+**As built (Day 1, verified installed):** Next.js `16.3.4` · React `19.2.8` · TypeScript `5` strict · Tailwind `4` · Mongoose `9.9.4` · NextAuth `4.24.15` · Zod `4.5.4` · bcryptjs `3.0.3` · Node `24`.
+
+Two notes on those choices. The table below says "Next.js 14+" — 16 satisfies that and is what `create-next-app` now produces; Tailwind 4 means design tokens live in `@theme` inside `app/globals.css` rather than a `tailwind.config.js`. And NextAuth stayed on **v4 stable**, not the v5 beta: v4 declares support for Next 16 and React 19, and its `getServerSession` is the exact API `API_SPEC.md` specifies. A beta auth library is not where a solo build with a fixed deadline should spend its risk budget.
+
 | Layer | Choice | Why |
 |---|---|---|
 | Framework | Next.js 14+ (App Router) | Single codebase for frontend + backend API routes — no separate Express server, one Vercel deployment |
