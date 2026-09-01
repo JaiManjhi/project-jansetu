@@ -79,7 +79,11 @@ Both Atlas index definitions use `numDimensions: 768`. Problem and institution v
 **Algorithm:**
 1. Run an Atlas `$vectorSearch` query on the `problem_embedding_index`, filtered to `district` = the new submission's district AND `createdAt` within the last 90 days, `status` not `"duplicate_merged"`. All three filter paths must be declared as `filter` fields in the index definition — see `DATA_MODEL.md`, this is a query-time failure if missed. `district` comes from the server-side centroid lookup, not from the client.
 2. Take the top result's cosine similarity score
-3. **If similarity ≥ 0.82:** treat as duplicate. Do not create a new `problems` doc. Instead: increment the existing doc's `upvoteCount` by 1, and (optionally) append the new submission's `mediaUrls` to the existing doc if they add new evidence. Set response `status: "duplicate_merged"`, `duplicateOf: <existing problem id>`.
+3. **If similarity ≥ 0.82:** treat as duplicate. Mark the new submission's own doc `status: "duplicate_merged"`, `duplicateOf: <existing problem id>`, then increment the existing doc's `upvoteCount` by 1 and (optionally) append the new submission's `mediaUrls` to it if they add new evidence.
+
+> **Corrected 2026-09-01.** This step previously read "do not create a new `problems` doc", which contradicted `DATA_MODEL.md`: the schema carries both `status: "duplicate_merged"` and `duplicateOf` **on a problems doc**, and neither field can ever be set if the duplicate's doc is never created. The schema is the source of truth, and it is also the better design — the doc is written before the AI pipeline runs (`ARCHITECTURE.md §6` step 3) so a submission is durable the moment it arrives, the citizen's exact wording and media are preserved rather than discarded, and there is an audit trail showing what was merged into what. "Do not create" would also have made the `status` filter in step 1 pointless, since nothing would ever carry that status.
+
+**Self-match.** Because the doc is written before dedup runs, the new submission is in the collection *with its own embedding* by the time the search executes, and would otherwise return itself at similarity 1.0 — an automatic false positive on every single submission. The `status` filter is what prevents this: the new doc is still `"processing"` at this point, so filtering to exclude both `"duplicate_merged"` and `"processing"` removes it. Excluding `"processing"` is correct on its own merits too — such a doc has not finished the pipeline and is not a valid merge target. The implementation additionally drops any hit whose `_id` equals the new doc's, as a cheap guard that does not depend on getting the filter exactly right.
 4. **If similarity < 0.82:** treat as a new, distinct problem. Proceed to classification and routing normally.
 
 ### ⚠ Atlas `vectorSearchScore` is NOT raw cosine similarity
@@ -110,6 +114,21 @@ Measured on a deliberately constructed triplet, all in the same district:
 The hard negative ("school has no boundary wall, cattle wander in" vs "hand pump broken") is the case that matters: at raw cosine it is correctly rejected, but its Atlas score of 0.8770 clears a naive `score >= 0.82` check and would be wrongly merged.
 
 **This is one hand-built triplet, not a calibration.** It is enough to show 0.82-on-raw-cosine is in a sensible region and that the naive comparison is broken; it is not enough to set the threshold. The ~50-pair labelled set in §6 still has to do that.
+
+### ⚠ Atlas Search indexing is asynchronous — `$vectorSearch` alone is not enough
+
+**Measured 2026-09-01.** A document is durable in MongoDB the moment it is written, but it does **not** become visible to `$vectorSearch` for seconds to tens of seconds. A reworded duplicate submitted immediately after its original was **not** detected; the identical submission 20 seconds later **was**.
+
+That window is exactly when a live demo runs. The demo script is "submit a problem, then submit the same problem in different words" — and relying on `$vectorSearch` alone means the best beat in the pitch silently does nothing. Worse, it fails *quietly*: the second report just looks like a new problem.
+
+The dedup step therefore runs **two** searches and takes the better score:
+
+1. `$vectorSearch` over the 90-day window — the real workhorse, covers everything already indexed.
+2. A **freshness sweep**: same district, `createdAt` within the last 10 minutes, compared in memory with `cosineSimilarity`. This reads through the ordinary `{ district: 1, createdAt: -1 }` index, which is immediately consistent, and is capped at 50 documents. It exists solely to cover the indexing lag.
+
+Results are merged by problem id, keeping the higher score. The sweep is cheap at demo scale and bounded at any scale; if it ever needs to grow, narrow the window rather than raising the cap.
+
+**Verified end to end with no delay between submissions:** original → `routed`; reworded duplicate → `duplicate_merged` at cosine **0.9018** with the original's `upvoteCount` incremented; hard negative → stayed distinct at **0.7208**; same wording in a different district → stayed distinct, confirming district scoping.
 
 **Threshold calibration note:** 0.82 is a starting point, not a proven constant. This threshold is the single highest-risk parameter in the entire system for the live demo — it must be tuned against real test pairs (see §6) before demo day, not left at the default. Log every dedup decision (similarity score + outcome) during testing so the threshold can be adjusted with evidence, not guesswork.
 
