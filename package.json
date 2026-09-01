@@ -9,7 +9,9 @@
     "lint": "eslint",
     "seed:institutions": "node --env-file=.env.local scripts/seed-institutions.mts",
     "typecheck": "tsc --noEmit",
-    "db:indexes": "node --env-file=.env.local scripts/create-search-indexes.mts"
+    "db:indexes": "node --env-file=.env.local scripts/create-search-indexes.mts",
+    "test": "node --test tests/*.test.mts",
+    "build:districts": "node --max-old-space-size=4096 scripts/build-districts.mts"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",

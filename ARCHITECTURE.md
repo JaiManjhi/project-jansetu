@@ -106,10 +106,23 @@ jansetu/
 │   ├── institutions-seed.json        # AISHE/AICTE-sourced + curated deep profiles
 │   └── districts.json                # district/state centroids, static — read from disk, never seeded to Mongo
 ├── scripts/
-│   └── seed-institutions.ts          # one-off script to load data/institutions-seed.json into Mongo
+│   ├── seed-institutions.mts         # loads data/institutions-seed.json into Mongo
+│   ├── create-search-indexes.mts     # creates the two Atlas vector indexes (idempotent)
+│   └── build-districts.mts           # one-time: boundary GeoJSON → data/districts.json
+├── tests/
+│   └── geo.test.mts                  # node:test — no test framework dependency
 ├── .env.local                        # see SETUP.md — never commit
 └── next.config.js
 ```
+
+**On scripts and tests.** Both use Node 24's native TypeScript type-stripping and the `.mts` extension, so they run with plain `node` and need no build step, no `ts-node`, and no `tsx`. Tests use the built-in `node:test` runner — **zero test-framework dependencies**, which matters on a 10-day budget where a Jest/Vitest config is a half-day of yak-shaving that buys nothing at this scale.
+
+Two consequences worth knowing:
+
+- Scripts and tests import with **relative paths and explicit `.ts` extensions** (`../lib/geo/haversine.ts`), not the `@/` alias — plain Node does not read `tsconfig.json` `paths`. `allowImportingTsExtensions` is enabled in `tsconfig.json` to permit this, which is only legal because `noEmit` is set.
+- JSON imports carry an explicit import attribute (`with { type: "json" }`), required by Node ESM. Turbopack accepts it too, so the same module works unchanged in the app and under `node --test`.
+
+Run with `npm test`, `npm run db:indexes`, `npm run build:districts <path-to-geojson>`.
 
 ## 6. Data flow — problem submission, step by step
 
