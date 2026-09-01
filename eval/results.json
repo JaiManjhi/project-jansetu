@@ -1,0 +1,1548 @@
+{
+  "generatedAt": "2026-09-01T18:35:47.316Z",
+  "classification": {
+    "total": 150,
+    "correct": 130,
+    "errors": 0,
+    "accuracy": 0.8666666666666667,
+    "results": [
+      {
+        "id": "wr01",
+        "expected": "water_resources",
+        "actual": "water_resources",
+        "provider": "groq"
+      },
+      {
+        "id": "wr02",
+        "expected": "water_resources",
+        "actual": "water_resources",
+        "provider": "groq"
+      },
+      {
+        "id": "wr03",
+        "expected": "water_resources",
+        "actual": "water_resources",
+        "provider": "groq"
+      },
+      {
+        "id": "wr04",
+        "expected": "water_resources",
+        "actual": "water_resources",
+        "provider": "groq"
+      },
+      {
+        "id": "wr05",
+        "expected": "water_resources",
+        "actual": "water_resources",
+        "provider": "groq"
+      },
+      {
+        "id": "wr06",
+        "expected": "water_resources",
+        "actual": "water_resources",
+        "provider": "groq"
+      },
+      {
+        "id": "wr07",
+        "expected": "water_resources",
+        "actual": "water_resources",
+        "provider": "groq"
+      },
+      {
+        "id": "wr08",
+        "expected": "water_resources",
+        "actual": "water_resources",
+        "provider": "groq"
+      },
+      {
+        "id": "wr09",
+        "expected": "water_resources",
+        "actual": "water_resources",
+        "provider": "groq"
+      },
+      {
+        "id": "wr10",
+        "expected": "water_resources",
+        "actual": "water_resources",
+        "provider": "groq"
+      },
+      {
+        "id": "wr11",
+        "expected": "water_resources",
+        "actual": "water_resources",
+        "provider": "groq"
+      },
+      {
+        "id": "wr12",
+        "expected": "water_resources",
+        "actual": "water_resources",
+        "provider": "groq"
+      },
+      {
+        "id": "wr13",
+        "expected": "water_resources",
+        "actual": "water_resources",
+        "provider": "groq"
+      },
+      {
+        "id": "wr14",
+        "expected": "water_resources",
+        "actual": "agriculture",
+        "provider": "groq"
+      },
+      {
+        "id": "wr15",
+        "expected": "water_resources",
+        "actual": "water_resources",
+        "provider": "groq"
+      },
+      {
+        "id": "hc01",
+        "expected": "healthcare",
+        "actual": "healthcare",
+        "provider": "groq"
+      },
+      {
+        "id": "hc02",
+        "expected": "healthcare",
+        "actual": "healthcare",
+        "provider": "groq"
+      },
+      {
+        "id": "hc03",
+        "expected": "healthcare",
+        "actual": "healthcare",
+        "provider": "groq"
+      },
+      {
+        "id": "hc04",
+        "expected": "healthcare",
+        "actual": "healthcare",
+        "provider": "groq"
+      },
+      {
+        "id": "hc05",
+        "expected": "healthcare",
+        "actual": "healthcare",
+        "provider": "groq"
+      },
+      {
+        "id": "hc06",
+        "expected": "healthcare",
+        "actual": "healthcare",
+        "provider": "groq"
+      },
+      {
+        "id": "hc07",
+        "expected": "healthcare",
+        "actual": "healthcare",
+        "provider": "groq"
+      },
+      {
+        "id": "hc08",
+        "expected": "healthcare",
+        "actual": "healthcare",
+        "provider": "groq"
+      },
+      {
+        "id": "hc09",
+        "expected": "healthcare",
+        "actual": "healthcare",
+        "provider": "groq"
+      },
+      {
+        "id": "hc10",
+        "expected": "healthcare",
+        "actual": "accessibility",
+        "provider": "groq"
+      },
+      {
+        "id": "hc11",
+        "expected": "healthcare",
+        "actual": "healthcare",
+        "provider": "groq"
+      },
+      {
+        "id": "hc12",
+        "expected": "healthcare",
+        "actual": "healthcare",
+        "provider": "groq"
+      },
+      {
+        "id": "hc13",
+        "expected": "healthcare",
+        "actual": "healthcare",
+        "provider": "groq"
+      },
+      {
+        "id": "hc14",
+        "expected": "healthcare",
+        "actual": "healthcare",
+        "provider": "groq"
+      },
+      {
+        "id": "hc15",
+        "expected": "healthcare",
+        "actual": "healthcare",
+        "provider": "groq"
+      },
+      {
+        "id": "ed01",
+        "expected": "education",
+        "actual": "education",
+        "provider": "gemini"
+      },
+      {
+        "id": "ed02",
+        "expected": "education",
+        "actual": "education",
+        "provider": "gemini"
+      },
+      {
+        "id": "ed03",
+        "expected": "education",
+        "actual": "education",
+        "provider": "groq"
+      },
+      {
+        "id": "ed04",
+        "expected": "education",
+        "actual": "education",
+        "provider": "gemini"
+      },
+      {
+        "id": "ed05",
+        "expected": "education",
+        "actual": "education",
+        "provider": "groq"
+      },
+      {
+        "id": "ed06",
+        "expected": "education",
+        "actual": "education",
+        "provider": "gemini"
+      },
+      {
+        "id": "ed07",
+        "expected": "education",
+        "actual": "education",
+        "provider": "groq"
+      },
+      {
+        "id": "ed08",
+        "expected": "education",
+        "actual": "education",
+        "provider": "groq"
+      },
+      {
+        "id": "ed09",
+        "expected": "education",
+        "actual": "education",
+        "provider": "gemini"
+      },
+      {
+        "id": "ed10",
+        "expected": "education",
+        "actual": "education",
+        "provider": "groq"
+      },
+      {
+        "id": "ed11",
+        "expected": "education",
+        "actual": "education",
+        "provider": "groq"
+      },
+      {
+        "id": "ed12",
+        "expected": "education",
+        "actual": "education",
+        "provider": "gemini"
+      },
+      {
+        "id": "ed13",
+        "expected": "education",
+        "actual": "education",
+        "provider": "groq"
+      },
+      {
+        "id": "ed14",
+        "expected": "education",
+        "actual": "education",
+        "provider": "groq"
+      },
+      {
+        "id": "ed15",
+        "expected": "education",
+        "actual": "education",
+        "provider": "groq"
+      },
+      {
+        "id": "ag01",
+        "expected": "agriculture",
+        "actual": "agriculture",
+        "provider": "groq"
+      },
+      {
+        "id": "ag02",
+        "expected": "agriculture",
+        "actual": "agriculture",
+        "provider": "groq"
+      },
+      {
+        "id": "ag03",
+        "expected": "agriculture",
+        "actual": "agriculture",
+        "provider": "groq"
+      },
+      {
+        "id": "ag04",
+        "expected": "agriculture",
+        "actual": "agriculture",
+        "provider": "groq"
+      },
+      {
+        "id": "ag05",
+        "expected": "agriculture",
+        "actual": "agriculture",
+        "provider": "gemini"
+      },
+      {
+        "id": "ag06",
+        "expected": "agriculture",
+        "actual": "agriculture",
+        "provider": "gemini"
+      },
+      {
+        "id": "ag07",
+        "expected": "agriculture",
+        "actual": "agriculture",
+        "provider": "groq"
+      },
+      {
+        "id": "ag08",
+        "expected": "agriculture",
+        "actual": "agriculture",
+        "provider": "gemini"
+      },
+      {
+        "id": "ag09",
+        "expected": "agriculture",
+        "actual": "agriculture",
+        "provider": "groq"
+      },
+      {
+        "id": "ag10",
+        "expected": "agriculture",
+        "actual": "agriculture",
+        "provider": "gemini"
+      },
+      {
+        "id": "ag11",
+        "expected": "agriculture",
+        "actual": "agriculture",
+        "provider": "gemini"
+      },
+      {
+        "id": "ag12",
+        "expected": "agriculture",
+        "actual": "agriculture",
+        "provider": "groq"
+      },
+      {
+        "id": "ag13",
+        "expected": "agriculture",
+        "actual": "agriculture",
+        "provider": "gemini"
+      },
+      {
+        "id": "ag14",
+        "expected": "agriculture",
+        "actual": "agriculture",
+        "provider": "groq"
+      },
+      {
+        "id": "ag15",
+        "expected": "agriculture",
+        "actual": "agriculture",
+        "provider": "groq"
+      },
+      {
+        "id": "en01",
+        "expected": "environment",
+        "actual": "environment",
+        "provider": "groq"
+      },
+      {
+        "id": "en02",
+        "expected": "environment",
+        "actual": "environment",
+        "provider": "groq"
+      },
+      {
+        "id": "en03",
+        "expected": "environment",
+        "actual": "environment",
+        "provider": "groq"
+      },
+      {
+        "id": "en04",
+        "expected": "environment",
+        "actual": "environment",
+        "provider": "groq"
+      },
+      {
+        "id": "en05",
+        "expected": "environment",
+        "actual": "environment",
+        "provider": "groq"
+      },
+      {
+        "id": "en06",
+        "expected": "environment",
+        "actual": "environment",
+        "provider": "groq"
+      },
+      {
+        "id": "en07",
+        "expected": "environment",
+        "actual": "healthcare",
+        "provider": "groq"
+      },
+      {
+        "id": "en08",
+        "expected": "environment",
+        "actual": "water_resources",
+        "provider": "groq"
+      },
+      {
+        "id": "en09",
+        "expected": "environment",
+        "actual": "environment",
+        "provider": "groq"
+      },
+      {
+        "id": "en10",
+        "expected": "environment",
+        "actual": "environment",
+        "provider": "groq"
+      },
+      {
+        "id": "en11",
+        "expected": "environment",
+        "actual": "environment",
+        "provider": "groq"
+      },
+      {
+        "id": "en12",
+        "expected": "environment",
+        "actual": "agriculture",
+        "provider": "gemini"
+      },
+      {
+        "id": "en13",
+        "expected": "environment",
+        "actual": "environment",
+        "provider": "groq"
+      },
+      {
+        "id": "en14",
+        "expected": "environment",
+        "actual": "environment",
+        "provider": "groq"
+      },
+      {
+        "id": "en15",
+        "expected": "environment",
+        "actual": "environment",
+        "provider": "groq"
+      },
+      {
+        "id": "eg01",
+        "expected": "energy",
+        "actual": "energy",
+        "provider": "groq"
+      },
+      {
+        "id": "eg02",
+        "expected": "energy",
+        "actual": "energy",
+        "provider": "groq"
+      },
+      {
+        "id": "eg03",
+        "expected": "energy",
+        "actual": "urban_infrastructure",
+        "provider": "groq"
+      },
+      {
+        "id": "eg04",
+        "expected": "energy",
+        "actual": "energy",
+        "provider": "groq"
+      },
+      {
+        "id": "eg05",
+        "expected": "energy",
+        "actual": "energy",
+        "provider": "groq"
+      },
+      {
+        "id": "eg06",
+        "expected": "energy",
+        "actual": "urban_infrastructure",
+        "provider": "groq"
+      },
+      {
+        "id": "eg07",
+        "expected": "energy",
+        "actual": "energy",
+        "provider": "groq"
+      },
+      {
+        "id": "eg08",
+        "expected": "energy",
+        "actual": "energy",
+        "provider": "groq"
+      },
+      {
+        "id": "eg09",
+        "expected": "energy",
+        "actual": "energy",
+        "provider": "groq"
+      },
+      {
+        "id": "eg10",
+        "expected": "energy",
+        "actual": "agriculture",
+        "provider": "groq"
+      },
+      {
+        "id": "eg11",
+        "expected": "energy",
+        "actual": "education",
+        "provider": "groq"
+      },
+      {
+        "id": "eg12",
+        "expected": "energy",
+        "actual": "water_resources",
+        "provider": "groq"
+      },
+      {
+        "id": "eg13",
+        "expected": "energy",
+        "actual": "urban_infrastructure",
+        "provider": "groq"
+      },
+      {
+        "id": "eg14",
+        "expected": "energy",
+        "actual": "energy",
+        "provider": "groq"
+      },
+      {
+        "id": "eg15",
+        "expected": "energy",
+        "actual": "energy",
+        "provider": "groq"
+      },
+      {
+        "id": "ui01",
+        "expected": "urban_infrastructure",
+        "actual": "urban_infrastructure",
+        "provider": "groq"
+      },
+      {
+        "id": "ui02",
+        "expected": "urban_infrastructure",
+        "actual": "urban_infrastructure",
+        "provider": "groq"
+      },
+      {
+        "id": "ui03",
+        "expected": "urban_infrastructure",
+        "actual": "urban_infrastructure",
+        "provider": "groq"
+      },
+      {
+        "id": "ui04",
+        "expected": "urban_infrastructure",
+        "actual": "urban_infrastructure",
+        "provider": "groq"
+      },
+      {
+        "id": "ui05",
+        "expected": "urban_infrastructure",
+        "actual": "urban_infrastructure",
+        "provider": "groq"
+      },
+      {
+        "id": "ui06",
+        "expected": "urban_infrastructure",
+        "actual": "urban_infrastructure",
+        "provider": "groq"
+      },
+      {
+        "id": "ui07",
+        "expected": "urban_infrastructure",
+        "actual": "urban_infrastructure",
+        "provider": "groq"
+      },
+      {
+        "id": "ui08",
+        "expected": "urban_infrastructure",
+        "actual": "urban_infrastructure",
+        "provider": "groq"
+      },
+      {
+        "id": "ui09",
+        "expected": "urban_infrastructure",
+        "actual": "urban_infrastructure",
+        "provider": "groq"
+      },
+      {
+        "id": "ui10",
+        "expected": "urban_infrastructure",
+        "actual": "urban_infrastructure",
+        "provider": "groq"
+      },
+      {
+        "id": "ui11",
+        "expected": "urban_infrastructure",
+        "actual": "urban_infrastructure",
+        "provider": "groq"
+      },
+      {
+        "id": "ui12",
+        "expected": "urban_infrastructure",
+        "actual": "urban_infrastructure",
+        "provider": "groq"
+      },
+      {
+        "id": "ui13",
+        "expected": "urban_infrastructure",
+        "actual": "urban_infrastructure",
+        "provider": "groq"
+      },
+      {
+        "id": "ui14",
+        "expected": "urban_infrastructure",
+        "actual": "urban_infrastructure",
+        "provider": "groq"
+      },
+      {
+        "id": "ui15",
+        "expected": "urban_infrastructure",
+        "actual": "urban_infrastructure",
+        "provider": "groq"
+      },
+      {
+        "id": "ac01",
+        "expected": "accessibility",
+        "actual": "accessibility",
+        "provider": "groq"
+      },
+      {
+        "id": "ac02",
+        "expected": "accessibility",
+        "actual": "accessibility",
+        "provider": "groq"
+      },
+      {
+        "id": "ac03",
+        "expected": "accessibility",
+        "actual": "accessibility",
+        "provider": "groq"
+      },
+      {
+        "id": "ac04",
+        "expected": "accessibility",
+        "actual": "accessibility",
+        "provider": "groq"
+      },
+      {
+        "id": "ac05",
+        "expected": "accessibility",
+        "actual": "accessibility",
+        "provider": "groq"
+      },
+      {
+        "id": "ac06",
+        "expected": "accessibility",
+        "actual": "accessibility",
+        "provider": "groq"
+      },
+      {
+        "id": "ac07",
+        "expected": "accessibility",
+        "actual": "education",
+        "provider": "groq"
+      },
+      {
+        "id": "ac08",
+        "expected": "accessibility",
+        "actual": "accessibility",
+        "provider": "groq"
+      },
+      {
+        "id": "ac09",
+        "expected": "accessibility",
+        "actual": "healthcare",
+        "provider": "groq"
+      },
+      {
+        "id": "ac10",
+        "expected": "accessibility",
+        "actual": "accessibility",
+        "provider": "groq"
+      },
+      {
+        "id": "ac11",
+        "expected": "accessibility",
+        "actual": "accessibility",
+        "provider": "groq"
+      },
+      {
+        "id": "ac12",
+        "expected": "accessibility",
+        "actual": "accessibility",
+        "provider": "groq"
+      },
+      {
+        "id": "ac13",
+        "expected": "accessibility",
+        "actual": "education",
+        "provider": "groq"
+      },
+      {
+        "id": "ac14",
+        "expected": "accessibility",
+        "actual": "accessibility",
+        "provider": "groq"
+      },
+      {
+        "id": "ac15",
+        "expected": "accessibility",
+        "actual": "accessibility",
+        "provider": "groq"
+      },
+      {
+        "id": "pa01",
+        "expected": "public_administration",
+        "actual": "public_administration",
+        "provider": "groq"
+      },
+      {
+        "id": "pa02",
+        "expected": "public_administration",
+        "actual": "public_administration",
+        "provider": "groq"
+      },
+      {
+        "id": "pa03",
+        "expected": "public_administration",
+        "actual": "public_administration",
+        "provider": "groq"
+      },
+      {
+        "id": "pa04",
+        "expected": "public_administration",
+        "actual": "public_administration",
+        "provider": "groq"
+      },
+      {
+        "id": "pa05",
+        "expected": "public_administration",
+        "actual": "public_administration",
+        "provider": "groq"
+      },
+      {
+        "id": "pa06",
+        "expected": "public_administration",
+        "actual": "rural_livelihoods",
+        "provider": "groq"
+      },
+      {
+        "id": "pa07",
+        "expected": "public_administration",
+        "actual": "public_administration",
+        "provider": "groq"
+      },
+      {
+        "id": "pa08",
+        "expected": "public_administration",
+        "actual": "public_administration",
+        "provider": "groq"
+      },
+      {
+        "id": "pa09",
+        "expected": "public_administration",
+        "actual": "public_administration",
+        "provider": "groq"
+      },
+      {
+        "id": "pa10",
+        "expected": "public_administration",
+        "actual": "public_administration",
+        "provider": "groq"
+      },
+      {
+        "id": "pa11",
+        "expected": "public_administration",
+        "actual": "public_administration",
+        "provider": "groq"
+      },
+      {
+        "id": "pa12",
+        "expected": "public_administration",
+        "actual": "public_administration",
+        "provider": "groq"
+      },
+      {
+        "id": "pa13",
+        "expected": "public_administration",
+        "actual": "public_administration",
+        "provider": "groq"
+      },
+      {
+        "id": "pa14",
+        "expected": "public_administration",
+        "actual": "education",
+        "provider": "groq"
+      },
+      {
+        "id": "pa15",
+        "expected": "public_administration",
+        "actual": "public_administration",
+        "provider": "groq"
+      },
+      {
+        "id": "rl01",
+        "expected": "rural_livelihoods",
+        "actual": "rural_livelihoods",
+        "provider": "groq"
+      },
+      {
+        "id": "rl02",
+        "expected": "rural_livelihoods",
+        "actual": "rural_livelihoods",
+        "provider": "groq"
+      },
+      {
+        "id": "rl03",
+        "expected": "rural_livelihoods",
+        "actual": "rural_livelihoods",
+        "provider": "groq"
+      },
+      {
+        "id": "rl04",
+        "expected": "rural_livelihoods",
+        "actual": "rural_livelihoods",
+        "provider": "groq"
+      },
+      {
+        "id": "rl05",
+        "expected": "rural_livelihoods",
+        "actual": "education",
+        "provider": "groq"
+      },
+      {
+        "id": "rl06",
+        "expected": "rural_livelihoods",
+        "actual": "rural_livelihoods",
+        "provider": "groq"
+      },
+      {
+        "id": "rl07",
+        "expected": "rural_livelihoods",
+        "actual": "rural_livelihoods",
+        "provider": "groq"
+      },
+      {
+        "id": "rl08",
+        "expected": "rural_livelihoods",
+        "actual": "rural_livelihoods",
+        "provider": "groq"
+      },
+      {
+        "id": "rl09",
+        "expected": "rural_livelihoods",
+        "actual": "agriculture",
+        "provider": "groq"
+      },
+      {
+        "id": "rl10",
+        "expected": "rural_livelihoods",
+        "actual": "rural_livelihoods",
+        "provider": "groq"
+      },
+      {
+        "id": "rl11",
+        "expected": "rural_livelihoods",
+        "actual": "agriculture",
+        "provider": "groq"
+      },
+      {
+        "id": "rl12",
+        "expected": "rural_livelihoods",
+        "actual": "rural_livelihoods",
+        "provider": "groq"
+      },
+      {
+        "id": "rl13",
+        "expected": "rural_livelihoods",
+        "actual": "rural_livelihoods",
+        "provider": "groq"
+      },
+      {
+        "id": "rl14",
+        "expected": "rural_livelihoods",
+        "actual": "rural_livelihoods",
+        "provider": "groq"
+      },
+      {
+        "id": "rl15",
+        "expected": "rural_livelihoods",
+        "actual": "agriculture",
+        "provider": "groq"
+      }
+    ]
+  },
+  "dedup": {
+    "pairs": 50,
+    "scored": [
+      {
+        "id": "d01",
+        "expected": "duplicate",
+        "similarity": 0.9063587465475961
+      },
+      {
+        "id": "d02",
+        "expected": "duplicate",
+        "similarity": 0.8502341436367631
+      },
+      {
+        "id": "d03",
+        "expected": "duplicate",
+        "similarity": 0.8714053427205564
+      },
+      {
+        "id": "d04",
+        "expected": "duplicate",
+        "similarity": 0.871875715534591
+      },
+      {
+        "id": "d05",
+        "expected": "duplicate",
+        "similarity": 0.9022213387032846
+      },
+      {
+        "id": "d06",
+        "expected": "duplicate",
+        "similarity": 0.8272415070936677
+      },
+      {
+        "id": "d07",
+        "expected": "duplicate",
+        "similarity": 0.926471828551858
+      },
+      {
+        "id": "d08",
+        "expected": "duplicate",
+        "similarity": 0.8793417089981965
+      },
+      {
+        "id": "d09",
+        "expected": "duplicate",
+        "similarity": 0.8910347103502733
+      },
+      {
+        "id": "d10",
+        "expected": "duplicate",
+        "similarity": 0.8546521761803187
+      },
+      {
+        "id": "d11",
+        "expected": "duplicate",
+        "similarity": 0.9250034178073104
+      },
+      {
+        "id": "d12",
+        "expected": "duplicate",
+        "similarity": 0.9068184557227709
+      },
+      {
+        "id": "d13",
+        "expected": "duplicate",
+        "similarity": 0.8936236258947141
+      },
+      {
+        "id": "d14",
+        "expected": "duplicate",
+        "similarity": 0.8740721978417395
+      },
+      {
+        "id": "d15",
+        "expected": "duplicate",
+        "similarity": 0.8850524767509423
+      },
+      {
+        "id": "d16",
+        "expected": "duplicate",
+        "similarity": 0.9065906931234486
+      },
+      {
+        "id": "d17",
+        "expected": "duplicate",
+        "similarity": 0.8779493244952002
+      },
+      {
+        "id": "d18",
+        "expected": "duplicate",
+        "similarity": 0.7911573810400544
+      },
+      {
+        "id": "d19",
+        "expected": "duplicate",
+        "similarity": 0.9225352228482336
+      },
+      {
+        "id": "d20",
+        "expected": "duplicate",
+        "similarity": 0.8823886483333435
+      },
+      {
+        "id": "d21",
+        "expected": "duplicate",
+        "similarity": 0.9319326181749978
+      },
+      {
+        "id": "d22",
+        "expected": "duplicate",
+        "similarity": 0.8771252135627442
+      },
+      {
+        "id": "n01",
+        "expected": "distinct",
+        "similarity": 0.7645283391142036
+      },
+      {
+        "id": "n02",
+        "expected": "distinct",
+        "similarity": 0.6908304325872695
+      },
+      {
+        "id": "n03",
+        "expected": "distinct",
+        "similarity": 0.7506775017173934
+      },
+      {
+        "id": "n04",
+        "expected": "distinct",
+        "similarity": 0.7688577296141713
+      },
+      {
+        "id": "n05",
+        "expected": "distinct",
+        "similarity": 0.7392229878088186
+      },
+      {
+        "id": "n06",
+        "expected": "distinct",
+        "similarity": 0.7394504488167796
+      },
+      {
+        "id": "n07",
+        "expected": "distinct",
+        "similarity": 0.7534192992489767
+      },
+      {
+        "id": "n08",
+        "expected": "distinct",
+        "similarity": 0.7483049945788995
+      },
+      {
+        "id": "n09",
+        "expected": "distinct",
+        "similarity": 0.7091740225208452
+      },
+      {
+        "id": "n10",
+        "expected": "distinct",
+        "similarity": 0.7598307732948157
+      },
+      {
+        "id": "n11",
+        "expected": "distinct",
+        "similarity": 0.8040883671386414
+      },
+      {
+        "id": "n12",
+        "expected": "distinct",
+        "similarity": 0.669758681866169
+      },
+      {
+        "id": "n13",
+        "expected": "distinct",
+        "similarity": 0.7897869084003523
+      },
+      {
+        "id": "n14",
+        "expected": "distinct",
+        "similarity": 0.6688017687865656
+      },
+      {
+        "id": "n15",
+        "expected": "distinct",
+        "similarity": 0.7198033733263551
+      },
+      {
+        "id": "n16",
+        "expected": "distinct",
+        "similarity": 0.8550276498330514
+      },
+      {
+        "id": "n17",
+        "expected": "distinct",
+        "similarity": 0.7073362048875237
+      },
+      {
+        "id": "n18",
+        "expected": "distinct",
+        "similarity": 0.8008512379469024
+      },
+      {
+        "id": "n19",
+        "expected": "distinct",
+        "similarity": 0.6740551972356056
+      },
+      {
+        "id": "n20",
+        "expected": "distinct",
+        "similarity": 0.704698149456504
+      },
+      {
+        "id": "n21",
+        "expected": "distinct",
+        "similarity": 0.6864615081668585
+      },
+      {
+        "id": "n22",
+        "expected": "distinct",
+        "similarity": 0.7568500322906729
+      },
+      {
+        "id": "n23",
+        "expected": "distinct",
+        "similarity": 0.7277556906925252
+      },
+      {
+        "id": "n24",
+        "expected": "distinct",
+        "similarity": 0.8096204777136019
+      },
+      {
+        "id": "n25",
+        "expected": "distinct",
+        "similarity": 0.6337991665372491
+      },
+      {
+        "id": "n26",
+        "expected": "distinct",
+        "similarity": 0.7724976312535765
+      },
+      {
+        "id": "n27",
+        "expected": "distinct",
+        "similarity": 0.8169523954115294
+      },
+      {
+        "id": "n28",
+        "expected": "distinct",
+        "similarity": 0.7813656617926531
+      }
+    ],
+    "current": {
+      "threshold": 0.82,
+      "tp": 21,
+      "fp": 1,
+      "fn": 1,
+      "tn": 27,
+      "precision": 0.9545454545454546,
+      "recall": 0.9545454545454546,
+      "f1": 0.9545454545454546
+    },
+    "chosen": {
+      "threshold": 0.82,
+      "tp": 21,
+      "fp": 1,
+      "fn": 1,
+      "tn": 27,
+      "precision": 0.9545454545454546,
+      "recall": 0.9545454545454546,
+      "f1": 0.9545454545454546
+    },
+    "sweep": [
+      {
+        "threshold": 0.6,
+        "tp": 22,
+        "fp": 28,
+        "fn": 0,
+        "tn": 0,
+        "precision": 0.44,
+        "recall": 1,
+        "f1": 0.6111111111111112
+      },
+      {
+        "threshold": 0.61,
+        "tp": 22,
+        "fp": 28,
+        "fn": 0,
+        "tn": 0,
+        "precision": 0.44,
+        "recall": 1,
+        "f1": 0.6111111111111112
+      },
+      {
+        "threshold": 0.62,
+        "tp": 22,
+        "fp": 28,
+        "fn": 0,
+        "tn": 0,
+        "precision": 0.44,
+        "recall": 1,
+        "f1": 0.6111111111111112
+      },
+      {
+        "threshold": 0.63,
+        "tp": 22,
+        "fp": 28,
+        "fn": 0,
+        "tn": 0,
+        "precision": 0.44,
+        "recall": 1,
+        "f1": 0.6111111111111112
+      },
+      {
+        "threshold": 0.64,
+        "tp": 22,
+        "fp": 27,
+        "fn": 0,
+        "tn": 1,
+        "precision": 0.4489795918367347,
+        "recall": 1,
+        "f1": 0.6197183098591549
+      },
+      {
+        "threshold": 0.65,
+        "tp": 22,
+        "fp": 27,
+        "fn": 0,
+        "tn": 1,
+        "precision": 0.4489795918367347,
+        "recall": 1,
+        "f1": 0.6197183098591549
+      },
+      {
+        "threshold": 0.66,
+        "tp": 22,
+        "fp": 27,
+        "fn": 0,
+        "tn": 1,
+        "precision": 0.4489795918367347,
+        "recall": 1,
+        "f1": 0.6197183098591549
+      },
+      {
+        "threshold": 0.67,
+        "tp": 22,
+        "fp": 25,
+        "fn": 0,
+        "tn": 3,
+        "precision": 0.46808510638297873,
+        "recall": 1,
+        "f1": 0.6376811594202899
+      },
+      {
+        "threshold": 0.68,
+        "tp": 22,
+        "fp": 24,
+        "fn": 0,
+        "tn": 4,
+        "precision": 0.4782608695652174,
+        "recall": 1,
+        "f1": 0.6470588235294118
+      },
+      {
+        "threshold": 0.69,
+        "tp": 22,
+        "fp": 23,
+        "fn": 0,
+        "tn": 5,
+        "precision": 0.4888888888888889,
+        "recall": 1,
+        "f1": 0.6567164179104478
+      },
+      {
+        "threshold": 0.7,
+        "tp": 22,
+        "fp": 22,
+        "fn": 0,
+        "tn": 6,
+        "precision": 0.5,
+        "recall": 1,
+        "f1": 0.6666666666666666
+      },
+      {
+        "threshold": 0.71,
+        "tp": 22,
+        "fp": 19,
+        "fn": 0,
+        "tn": 9,
+        "precision": 0.5365853658536586,
+        "recall": 1,
+        "f1": 0.6984126984126985
+      },
+      {
+        "threshold": 0.72,
+        "tp": 22,
+        "fp": 18,
+        "fn": 0,
+        "tn": 10,
+        "precision": 0.55,
+        "recall": 1,
+        "f1": 0.7096774193548387
+      },
+      {
+        "threshold": 0.73,
+        "tp": 22,
+        "fp": 17,
+        "fn": 0,
+        "tn": 11,
+        "precision": 0.5641025641025641,
+        "recall": 1,
+        "f1": 0.7213114754098361
+      },
+      {
+        "threshold": 0.74,
+        "tp": 22,
+        "fp": 15,
+        "fn": 0,
+        "tn": 13,
+        "precision": 0.5945945945945946,
+        "recall": 1,
+        "f1": 0.7457627118644068
+      },
+      {
+        "threshold": 0.75,
+        "tp": 22,
+        "fp": 14,
+        "fn": 0,
+        "tn": 14,
+        "precision": 0.6111111111111112,
+        "recall": 1,
+        "f1": 0.7586206896551725
+      },
+      {
+        "threshold": 0.76,
+        "tp": 22,
+        "fp": 10,
+        "fn": 0,
+        "tn": 18,
+        "precision": 0.6875,
+        "recall": 1,
+        "f1": 0.8148148148148148
+      },
+      {
+        "threshold": 0.77,
+        "tp": 22,
+        "fp": 8,
+        "fn": 0,
+        "tn": 20,
+        "precision": 0.7333333333333333,
+        "recall": 1,
+        "f1": 0.846153846153846
+      },
+      {
+        "threshold": 0.78,
+        "tp": 22,
+        "fp": 7,
+        "fn": 0,
+        "tn": 21,
+        "precision": 0.7586206896551724,
+        "recall": 1,
+        "f1": 0.8627450980392156
+      },
+      {
+        "threshold": 0.79,
+        "tp": 22,
+        "fp": 5,
+        "fn": 0,
+        "tn": 23,
+        "precision": 0.8148148148148148,
+        "recall": 1,
+        "f1": 0.8979591836734693
+      },
+      {
+        "threshold": 0.8,
+        "tp": 21,
+        "fp": 5,
+        "fn": 1,
+        "tn": 23,
+        "precision": 0.8076923076923077,
+        "recall": 0.9545454545454546,
+        "f1": 0.875
+      },
+      {
+        "threshold": 0.81,
+        "tp": 21,
+        "fp": 2,
+        "fn": 1,
+        "tn": 26,
+        "precision": 0.9130434782608695,
+        "recall": 0.9545454545454546,
+        "f1": 0.9333333333333332
+      },
+      {
+        "threshold": 0.82,
+        "tp": 21,
+        "fp": 1,
+        "fn": 1,
+        "tn": 27,
+        "precision": 0.9545454545454546,
+        "recall": 0.9545454545454546,
+        "f1": 0.9545454545454546
+      },
+      {
+        "threshold": 0.83,
+        "tp": 20,
+        "fp": 1,
+        "fn": 2,
+        "tn": 27,
+        "precision": 0.9523809523809523,
+        "recall": 0.9090909090909091,
+        "f1": 0.9302325581395349
+      },
+      {
+        "threshold": 0.84,
+        "tp": 20,
+        "fp": 1,
+        "fn": 2,
+        "tn": 27,
+        "precision": 0.9523809523809523,
+        "recall": 0.9090909090909091,
+        "f1": 0.9302325581395349
+      },
+      {
+        "threshold": 0.85,
+        "tp": 20,
+        "fp": 1,
+        "fn": 2,
+        "tn": 27,
+        "precision": 0.9523809523809523,
+        "recall": 0.9090909090909091,
+        "f1": 0.9302325581395349
+      },
+      {
+        "threshold": 0.86,
+        "tp": 18,
+        "fp": 0,
+        "fn": 4,
+        "tn": 28,
+        "precision": 1,
+        "recall": 0.8181818181818182,
+        "f1": 0.9
+      },
+      {
+        "threshold": 0.87,
+        "tp": 18,
+        "fp": 0,
+        "fn": 4,
+        "tn": 28,
+        "precision": 1,
+        "recall": 0.8181818181818182,
+        "f1": 0.9
+      },
+      {
+        "threshold": 0.88,
+        "tp": 12,
+        "fp": 0,
+        "fn": 10,
+        "tn": 28,
+        "precision": 1,
+        "recall": 0.5454545454545454,
+        "f1": 0.7058823529411764
+      },
+      {
+        "threshold": 0.89,
+        "tp": 10,
+        "fp": 0,
+        "fn": 12,
+        "tn": 28,
+        "precision": 1,
+        "recall": 0.45454545454545453,
+        "f1": 0.625
+      },
+      {
+        "threshold": 0.9,
+        "tp": 8,
+        "fp": 0,
+        "fn": 14,
+        "tn": 28,
+        "precision": 1,
+        "recall": 0.36363636363636365,
+        "f1": 0.5333333333333333
+      },
+      {
+        "threshold": 0.91,
+        "tp": 4,
+        "fp": 0,
+        "fn": 18,
+        "tn": 28,
+        "precision": 1,
+        "recall": 0.18181818181818182,
+        "f1": 0.3076923076923077
+      },
+      {
+        "threshold": 0.92,
+        "tp": 4,
+        "fp": 0,
+        "fn": 18,
+        "tn": 28,
+        "precision": 1,
+        "recall": 0.18181818181818182,
+        "f1": 0.3076923076923077
+      },
+      {
+        "threshold": 0.93,
+        "tp": 1,
+        "fp": 0,
+        "fn": 21,
+        "tn": 28,
+        "precision": 1,
+        "recall": 0.045454545454545456,
+        "f1": 0.08695652173913045
+      },
+      {
+        "threshold": 0.94,
+        "tp": 0,
+        "fp": 0,
+        "fn": 22,
+        "tn": 28,
+        "precision": 0,
+        "recall": 0,
+        "f1": 0
+      },
+      {
+        "threshold": 0.95,
+        "tp": 0,
+        "fp": 0,
+        "fn": 22,
+        "tn": 28,
+        "precision": 0,
+        "recall": 0,
+        "f1": 0
+      }
+    ]
+  }
+}

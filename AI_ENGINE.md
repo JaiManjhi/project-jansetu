@@ -130,7 +130,29 @@ Results are merged by problem id, keeping the higher score. The sweep is cheap a
 
 **Verified end to end with no delay between submissions:** original → `routed`; reworded duplicate → `duplicate_merged` at cosine **0.9018** with the original's `upvoteCount` incremented; hard negative → stayed distinct at **0.7208**; same wording in a different district → stayed distinct, confirming district scoping.
 
-**Threshold calibration note:** 0.82 is a starting point, not a proven constant. This threshold is the single highest-risk parameter in the entire system for the live demo — it must be tuned against real test pairs (see §6) before demo day, not left at the default. Log every dedup decision (similarity score + outcome) during testing so the threshold can be adjusted with evidence, not guesswork.
+### Threshold: CALIBRATED — 0.82 confirmed
+
+**Resolved 2026-09-02 against the 50-pair labelled set (§6).** A full sweep from 0.60 to 0.95 in 0.01 steps puts the best F1 at exactly **0.82**:
+
+| Threshold | Precision | Recall | F1 |
+|---|---|---|---|
+| 0.79 | 0.815 | 1.000 | 0.898 |
+| 0.81 | 0.913 | 0.955 | 0.933 |
+| **0.82** | **0.955** | **0.955** | **0.955** |
+| 0.83 | 0.952 | 0.909 | 0.930 |
+| 0.86 | 1.000 | 0.818 | 0.900 |
+| 0.90 | 1.000 | 0.364 | 0.533 |
+
+F1 0.955 against the PRD §9 target of ≥0.80. The doc's original guess turned out to be right — but it is now right *with evidence*, which is the difference that matters when a judge asks.
+
+Note the shape either side: recall collapses fast above 0.86 (0.364 by 0.90) while precision only creeps up. That asymmetry is worth understanding — if this ever needs retuning, moving down costs precision gradually, moving up costs recall abruptly.
+
+**The classes overlap and no threshold is perfect.** True duplicates ranged 0.7912–0.9319 (mean 0.8843); distinct pairs ranged 0.6338–0.8550 (mean 0.7430). The bands cross between 0.7912 and 0.8550, so two pairs are unavoidably wrong at 0.82:
+
+- `d18` — a genuine duplicate at cosine 0.7912, missed. One phrasing is heavily Hindi-inflected ("chapakal", "four hundred families") against plain English.
+- `n16` — a distinct pair at 0.8550, wrongly merged. Poor mid-day meals vs. undelivered anganwadi nutrition: different schemes, near-identical vocabulary.
+
+Ties in the sweep are broken toward the **higher** threshold, because the two error types are not symmetric: a false merge silently buries a citizen's report, while a missed merge only leaves a duplicate in the feed that an admin can still see. This threshold is the single highest-risk parameter in the entire system for the live demo — it must be tuned against real test pairs (see §6) before demo day, not left at the default. Log every dedup decision (similarity score + outcome) during testing so the threshold can be adjusted with evidence, not guesswork.
 
 ## 4. Routing / Matching
 
@@ -183,6 +205,44 @@ Most hackathon teams demo AI features live and never report a real accuracy numb
 1. **Classification test set:** write or AI-generate 150 synthetic civic problems, evenly spread across the 10 categories, hand-label each with its correct category. Run classification against all 150, report accuracy (correct/total) and a confusion matrix (which categories get confused with which — this is a genuinely interesting thing to show a judge).
 2. **Dedup test set:** construct ~50 pairs of problem descriptions — some genuine duplicates worded differently, some genuinely distinct problems that happen to share vocabulary (the hard negatives matter more than the easy positives). Label each pair "duplicate" or "not duplicate." Run the similarity check, report precision, recall, and F1 at the chosen threshold. Use this data to actually pick the threshold in §3, don't guess it.
 3. Store both test sets as JSON in a `eval/` directory so the numbers are reproducible, not just claimed.
+
+---
+
+## Results — measured 2026-09-02
+
+Run with `npm run eval` (or `npm run eval -- class` / `-- dedup`). Sets live in `eval/classification-set.json` (150 items, 15 per category) and `eval/dedup-pairs.json` (50 pairs, 22 duplicate / 28 distinct). Raw output is written to `eval/results.json`.
+
+| Metric | Result | PRD §9 target |
+|---|---|---|
+| Classification accuracy | **86.7%** (130/150) | ≥85% ✅ |
+| Dedup F1 @ 0.82 | **0.955** (P 0.955, R 0.955) | ≥0.80 ✅ |
+
+### Confusion matrix — the interesting part
+
+| Expected | Correct | Confused with |
+|---|---|---|
+| education | 15/15 | — |
+| agriculture | 15/15 | — |
+| urban_infrastructure | 15/15 | — |
+| water_resources | 14/15 | agriculture ×1 |
+| healthcare | 14/15 | accessibility ×1 |
+| public_administration | 13/15 | rural_livelihoods ×1, education ×1 |
+| environment | 12/15 | healthcare ×1, water_resources ×1, agriculture ×1 |
+| accessibility | 12/15 | education ×2, healthcare ×1 |
+| rural_livelihoods | 11/15 | agriculture ×3, education ×1 |
+| **energy** | **9/15** | urban_infrastructure ×3, agriculture ×1, education ×1, water_resources ×1 |
+
+**Be honest about what this shows.** A large share of these are not model errors but genuine overlap in the taxonomy, and several of our own ground-truth labels are debatable:
+
+- **energy is the weakest category by far**, and every miss is defensible. Dead solar street lights → `urban_infrastructure`. An uninstalled solar irrigation pump → `agriculture`. A school with a connection but no classroom wiring → `education`. The model is not wrong so much as the categories are not disjoint for infrastructure that *serves* another sector.
+- **rural_livelihoods → agriculture ×3** is the same problem: a dairy chilling centre or a fodder shortage is both.
+- **accessibility → education ×2** (sign-language teacher, special educator) — arguably the label should be education.
+
+The useful conclusion is not "86.7% and move on". It is that the single-label taxonomy forces a choice the real world does not, and `energy` is where that bites hardest. Options if this needs improving: add a few-shot disambiguation rule to the §1 prompt for infrastructure-serving-a-sector cases, or accept a primary/secondary category — the latter is a `DATA_MODEL.md` change and out of hackathon scope.
+
+### Harness note
+
+Classification is throttled to concurrency 2 with exponential backoff on HTTP 429. A first run at concurrency 4 hit the Groq free-tier limit on **108 of 150** items and reported a meaningless 26.7% "accuracy" — a reminder that an eval number is worthless without checking the error count behind it. The backoff lives in the harness, not in `classify.ts`: on the live submit path the correct response to a 429 is to fail over to Gemini immediately, because a citizen is waiting. Only a batch job should sit and wait for a quota window.
 
 ## 7. Fallback behavior when AI calls fail entirely
 

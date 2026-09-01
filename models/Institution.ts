@@ -1,11 +1,17 @@
-import { Schema, model, models, type Model, type Types } from "mongoose";
+import mongoose from "mongoose";
+import type { Model, Types } from "mongoose";
+
+// mongoose is CommonJS. Node ESM cannot see `models` as a named export (only
+// webpack interop can), so destructure from the default export instead —
+// this keeps the models importable from both Next and plain `node` scripts.
+const { Schema, model, models } = mongoose;
 import {
   DATA_DEPTH_ENUM,
   INSTITUTION_TYPE_ENUM,
   type DataDepth,
   type InstitutionType,
-} from "@/lib/constants";
-import type { GeoPoint } from "./Problem";
+} from "../lib/constants.ts";
+import type { GeoPoint } from "./Problem.ts";
 
 export interface DepartmentSubdoc {
   name: string;

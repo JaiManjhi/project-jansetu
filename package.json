@@ -11,7 +11,8 @@
     "typecheck": "tsc --noEmit",
     "db:indexes": "node --env-file=.env.local scripts/create-search-indexes.mts",
     "test": "node --env-file-if-exists=.env.local --test tests/*.test.mts",
-    "build:districts": "node --max-old-space-size=4096 scripts/build-districts.mts"
+    "build:districts": "node --max-old-space-size=4096 scripts/build-districts.mts",
+    "eval": "node --env-file=.env.local scripts/run-eval.mts"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",
