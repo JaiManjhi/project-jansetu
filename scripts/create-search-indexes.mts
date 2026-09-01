@@ -30,6 +30,29 @@ interface SearchIndexSpec {
   definition: { fields: Array<VectorFieldDef | FilterFieldDef> };
 }
 
+/**
+ * The driver types listSearchIndexes() as `{ name: string }`, but Atlas also
+ * returns `status` and `queryable` — which are the only fields that tell us
+ * whether an index is actually usable yet. Narrow from unknown rather than
+ * casting, so a future driver change surfaces here instead of at runtime.
+ */
+interface SearchIndexStatus {
+  name: string;
+  status?: string;
+  queryable?: boolean;
+}
+
+function toStatus(raw: unknown): SearchIndexStatus | null {
+  if (typeof raw !== "object" || raw === null) return null;
+  const o = raw as Record<string, unknown>;
+  if (typeof o.name !== "string") return null;
+  return {
+    name: o.name,
+    status: typeof o.status === "string" ? o.status : undefined,
+    queryable: typeof o.queryable === "boolean" ? o.queryable : undefined,
+  };
+}
+
 // gemini-embedding-2 at outputDimensionality 768 — see AI_ENGINE.md §2.
 const NUM_DIMENSIONS = 768;
 
@@ -93,7 +116,9 @@ async function main(): Promise<void> {
     }
 
     const collection = db.collection(spec.collection);
-    const existing = await collection.listSearchIndexes().toArray();
+    const existing = (await collection.listSearchIndexes().toArray())
+      .map(toStatus)
+      .filter((i): i is SearchIndexStatus => i !== null);
     const already = existing.find((i) => i.name === spec.name);
 
     if (already) {
@@ -122,10 +147,12 @@ async function main(): Promise<void> {
     let allReady = true;
 
     for (const spec of INDEXES) {
-      const list = await db
+      const list = (await db
         .collection(spec.collection)
         .listSearchIndexes()
-        .toArray();
+        .toArray())
+        .map(toStatus)
+        .filter((i): i is SearchIndexStatus => i !== null);
       const found = list.find((i) => i.name === spec.name);
       const status = found?.status ?? "MISSING";
       const queryable = found?.queryable === true;
