@@ -10,9 +10,15 @@ import { cosineSimilarity } from "./embed.ts";
  */
 
 /**
- * Raw-cosine threshold. 0.82 is the doc's starting point and is NOT yet
- * evidence-based — the ~50-pair labelled set in §6 has to set it. Every dedup
- * decision is logged so that calibration has data to work from.
+ * Raw-cosine threshold — CALIBRATED, not a placeholder.
+ *
+ * Swept 0.60-0.95 in 0.01 steps against the 50-pair labelled set (AI_ENGINE.md
+ * §6). F1 peaks at exactly 0.82 (P 0.955, R 0.955). The classes do overlap, so
+ * no value is perfect: true duplicates span 0.7912-0.9319, distinct pairs
+ * 0.6338-0.8550.
+ *
+ * Re-run `npm run eval -- dedup` after any change to the embedding model or
+ * dimension. This number is only valid for the vectors it was measured on.
  */
 export const DEDUP_THRESHOLD = 0.82;
 
@@ -97,15 +103,21 @@ export async function findDuplicate(
         // Copied because the driver's pipeline type wants a mutable array.
         queryVector: [...embedding],
         numCandidates: 100,
-        limit: 5,
+        // One extra slot: this submission itself is indexable and will occupy
+        // a result at similarity 1.0 before being filtered out by _id below.
+        limit: 6,
         // Every path here MUST be declared as a `filter` field on the index
         // (DATA_MODEL.md). Atlas rejects an undeclared filter at QUERY time,
         // not at index creation, so a missing one looks fine until now.
         filter: {
           district: { $eq: district },
-          // Excludes already-merged docs AND this submission itself, which is
-          // still "processing" at this point. See AI_ENGINE.md §3, self-match.
-          status: { $nin: ["duplicate_merged", "processing"] },
+          // Only merged docs are excluded. Deliberately NOT filtering out
+          // "processing": a problem sits in that state whenever the pipeline
+          // has not fully completed — including every problem right now, since
+          // matching is unbuilt — and excluding it would leave dedup with no
+          // candidates at all. Self-match is prevented by the _id filter
+          // below, which does not depend on status at all.
+          status: { $ne: "duplicate_merged" },
           createdAt: { $gte: windowStart },
         },
       },
@@ -139,7 +151,7 @@ export async function findDuplicate(
   const recent = await Problem.find({
     district,
     createdAt: { $gte: new Date(Date.now() - RECENCY_WINDOW_MS) },
-    status: { $nin: ["duplicate_merged", "processing"] },
+    status: { $ne: "duplicate_merged" },
     _id: { $ne: selfId },
     embedding: { $exists: true },
   })
@@ -175,8 +187,9 @@ export async function findDuplicate(
 
   const isDuplicate = similarity >= DEDUP_THRESHOLD;
 
-  // §3 requires logging every decision so the threshold can be set with
-  // evidence rather than guesswork. Keep this until §6 calibration is done.
+  // §3 requires logging every decision. Calibration is done, but this stays:
+  // it is the only visibility into a merge that should not have happened, and
+  // a wrong merge is otherwise indistinguishable from a correct one.
   console.info(
     `[dedup] district=${district} similarity=${similarity.toFixed(4)} ` +
       `threshold=${DEDUP_THRESHOLD} decision=${isDuplicate ? "DUPLICATE" : "distinct"} ` +

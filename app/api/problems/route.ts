@@ -102,8 +102,15 @@ export async function POST(request: Request) {
   if (embedding) {
     const dedup = await findDuplicate(embedding, district, problem._id);
     if (dedup.isDuplicate && dedup.bestMatch) {
+      // One read, for the fields the response needs. API_SPEC.md specifies
+      // that a duplicate_merged response carries the EXISTING problem's
+      // category, not null — the citizen is being shown that problem.
+      const original = await Problem.findById(dedup.bestMatch.problemId)
+        .select("_id category severityScore")
+        .lean();
+
       problem.status = "duplicate_merged";
-      problem.duplicateOf = (await Problem.findById(dedup.bestMatch.problemId).select("_id"))?._id ?? null;
+      problem.duplicateOf = original?._id ?? null;
       problem.needsReview = false;
       await problem.save();
 
@@ -121,8 +128,8 @@ export async function POST(request: Request) {
         {
           problemId: problem._id.toString(),
           status: "duplicate_merged",
-          category: null,
-          severityScore: null,
+          category: original?.category ?? null,
+          severityScore: original?.severityScore ?? null,
           district,
           state,
           needsReview: false,
@@ -161,7 +168,11 @@ export async function POST(request: Request) {
   const matches: never[] = [];
 
   problem.needsReview = needsReview;
-  problem.status = needsReview ? "processing" : "routed";
+  // "routed" means routed TO something. With matching unbuilt there are no
+  // matches, so claiming "routed" would tell the Day 8 admin dashboard that
+  // problems reached institutions that do not exist yet. Once match.ts lands
+  // and returns candidates, this becomes true on its own.
+  problem.status = needsReview || matches.length === 0 ? "processing" : "routed";
   await problem.save();
 
   return NextResponse.json(

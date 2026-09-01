@@ -52,6 +52,8 @@ Three response shapes are possible and the client must handle all three:
 - **Duplicate merged** — `status: "duplicate_merged"`, `duplicateOf` set, `matches: []`, and `category` is the *existing* problem's category. The citizen is shown the merged problem per `PRD.md §6`
 - **AI unavailable** — `status: "processing"`, `needsReview: true`, `category: null`, `matches: []`. The submission is saved and the citizen is told it was received and is being reviewed — never an error (`AI_ENGINE.md §7`)
 
+> **Interim behaviour while matching is unbuilt.** `lib/ai/match.ts` needs seeded institution data, so `matches` is currently always `[]` and **no problem reaches `status: "routed"`** — a successfully classified problem stays `"processing"` with `needsReview: false`. "Routed" means routed *to* something; marking it otherwise would tell the Day 8 admin dashboard that problems reached institutions that do not exist yet. The two states are distinguishable by `needsReview`: `true` means the AI failed and a human must classify, `false` means classified and awaiting routing. This resolves itself once matching returns candidates — no code change needed beyond building `match.ts`.
+
 ### `GET /api/problems` — **public**
 List problems. Query params: `category`, `state`, `district`, `status`, `page`, `limit`, and `needsReview` (**admin only** — returns the manual-classification queue from `AI_ENGINE.md §7`; reject or ignore this param for unauthenticated callers so the public feed can't enumerate failed submissions). Used for the public feed, the admin dashboard, and the admin review queue.
 
