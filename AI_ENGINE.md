@@ -23,7 +23,18 @@ Respond ONLY with valid JSON in this exact shape, no other text:
 {"category": "...", "severityScore": 0, "reasoning": "one short sentence"}
 ```
 
-**Model:** Groq (Llama 3.x, or current fast model — verify exact model name available on Groq at build time) as primary for latency; Gemini Flash as fallback if Groq errors or times out.
+**Model — verified against both live APIs on 2026-09-01:**
+
+| Role | Model | Measured |
+|---|---|---|
+| Primary | Groq `openai/gpt-oss-120b` | 724ms avg, 3/3 valid JSON, 3/3 correct category |
+| Fallback | Gemini `gemini-3.5-flash` | 2844ms, correct |
+
+> **Llama 3.x is no longer served by Groq.** This doc originally specified it; the account's live model list contains no Llama chat model at all (only `llama-prompt-guard-2-*` classifiers). Anything in an older doc or blog post referencing `llama-3.1-8b-instant` or similar on Groq is stale.
+
+Candidates benchmarked on the §1 prompt with three labelled problems, `temperature: 0`, `response_format: {type: "json_object"}` — all four returned valid JSON and the correct category, so the choice came down to latency: `openai/gpt-oss-120b` 724ms · `groq/compound-mini` 804ms · `openai/gpt-oss-20b` 1289ms · `qwen/qwen3.6-27b` 2625ms. The 120b model being *faster* than the 20b is not a typo — it reflects Groq's hardware allocation, not model size. Avoid the `groq/compound*` models regardless: they are agentic systems with built-in web search, which is wrong for a deterministic classifier.
+
+**Do not pin any Gemini model to a `-latest` alias.** Those resolve to the newest release, and on the free tier the newest models are congested: `gemini-3.7-flash`, `gemini-3.6-flash`, and `gemini-flash-latest` all returned `503 High demand` during verification, while `gemini-3.5-flash` answered normally. `gemini-2.5-flash` returns `404 — no longer available to new users`. A fallback that is itself unavailable is not a fallback. If `gemini-3.5-flash`'s 2.8s is too slow in practice, `gemini-3.5-flash-lite` answered correctly in 901ms.
 
 **Failure handling:** if the model returns invalid JSON or an out-of-enum category, retry once with a stricter reminder appended; if it fails twice, set `category: "public_administration"` (safe default) and set `needsReview: true` (a declared field on `problems` — see `DATA_MODEL.md`) for admin manual classification — do not silently drop a submission.
 
@@ -32,11 +43,28 @@ Respond ONLY with valid JSON in this exact shape, no other text:
 **Input:** `problems.description` (for problems) or `institutions.capabilityText` (for institutions)
 **Output:** a vector, stored in `problems.embedding` or `institutions.capabilityEmbedding`
 
-**Model:** Google Gemini embedding model. **Verify the current model name and its output dimension against Google's docs before wiring this up** — `text-embedding-004` was accurate when these docs were written but is likely superseded by `gemini-embedding-001`, which unlike its predecessor supports *selectable* output dimensions rather than one fixed size. Prefer the smallest offered dimension that still evaluates well (§6), since Atlas M0 has a hard storage ceiling and vector size is the single largest contributor to index size.
+**Model — RESOLVED and verified against the live API on 2026-09-01:**
 
-Record the confirmed model name and dimension **here** once verified, then use that same number in both Atlas Vector Search index definitions. Problem and institution vectors are compared directly against each other, so a mismatch between the two indexes is not a degraded match — it is a hard query error.
+```
+model:               gemini-embedding-2
+outputDimensionality: 768
+similarity:           cosine
+```
 
-> **Unresolved until build time:** model name and `numDimensions`. The `problem_embedding_index` definition in `DATA_MODEL.md` carries `"numDimensions": 0` as a deliberate placeholder so this can't be forgotten silently — 0 will fail loudly at index creation rather than quietly building a wrong index. `institution_capability_index` inherits whatever number you settle on.
+`text-embedding-004` from the original draft no longer appears in the account's model list at all. Three embedding models are available: `gemini-embedding-001`, `gemini-embedding-2`, and `gemini-embedding-2-preview`.
+
+**Why `gemini-embedding-2` at 768 and not `gemini-embedding-001`:** both default to 3072 dimensions and both support Matryoshka truncation to 768, but they behave differently at the truncated size. Measured L2 norms on the same input:
+
+| Model | 3072 (default) | 768 |
+|---|---|---|
+| `gemini-embedding-001` | 1.0000 | **0.5943 — not normalized** |
+| `gemini-embedding-2` | 1.0000 | **1.0000 — normalized** |
+
+`gemini-embedding-001` requires you to re-normalize truncated vectors yourself, and forgetting to is a silent correctness bug: cosine similarity happens to normalize internally so it mostly still works, which is exactly what makes it dangerous — it would survive testing and then misbehave the moment anything used dot-product. `gemini-embedding-2` returns unit vectors at 768 directly, so there is nothing to forget. It was also marginally faster (540ms vs 609ms).
+
+768 over 3072 is deliberate: Atlas M0 has a hard 512MB ceiling, vector size dominates index size, and 768 is far more than enough to separate short civic-problem texts. Latency is ~540-680ms per call either way.
+
+Both Atlas index definitions use `numDimensions: 768`. Problem and institution vectors are compared directly against each other, so a mismatch between the two indexes is not a degraded match — it is a hard query error.
 
 **`institutions.capabilityText` construction:** concatenate `name + " — " + departments.map(d => d.name + ": " + d.facultyExpertise.join(", ")).join("; ")`. This is what gets embedded — richer department/faculty text produces better matches than embedding just the institution name.
 
@@ -53,6 +81,35 @@ Record the confirmed model name and dimension **here** once verified, then use t
 2. Take the top result's cosine similarity score
 3. **If similarity ≥ 0.82:** treat as duplicate. Do not create a new `problems` doc. Instead: increment the existing doc's `upvoteCount` by 1, and (optionally) append the new submission's `mediaUrls` to the existing doc if they add new evidence. Set response `status: "duplicate_merged"`, `duplicateOf: <existing problem id>`.
 4. **If similarity < 0.82:** treat as a new, distinct problem. Proceed to classification and routing normally.
+
+### ⚠ Atlas `vectorSearchScore` is NOT raw cosine similarity
+
+**Verified empirically on 2026-09-01, predicted vs observed matching to four decimal places:**
+
+```
+atlasScore = (1 + rawCosine) / 2        rawCosine = (2 * atlasScore) - 1
+```
+
+`$meta: "vectorSearchScore"` returns cosine rescaled from `[-1, 1]` into `[0, 1]`. The 0.82 threshold in this document means **raw cosine**, so the dedup code MUST convert before comparing:
+
+```ts
+const rawCosine = 2 * hit.score - 1;
+if (rawCosine >= DEDUP_THRESHOLD) { /* duplicate */ }
+```
+
+Comparing `hit.score >= 0.82` directly — which is the obvious way to write it, and therefore the way it will get written — is equivalent to a raw-cosine threshold of **0.64**. That is not a slightly-loose threshold, it is a catastrophically loose one: it merges plainly unrelated problems, and it does so *silently*, since a wrongly-merged report just looks like a successful dedup. This is the concrete form the "single highest-risk parameter" warning takes. Write the conversion, and write a test that asserts it.
+
+Measured on a deliberately constructed triplet, all in the same district:
+
+| Pair | Raw cosine | Atlas score | Correct call at raw-cosine 0.82 |
+|---|---|---|---|
+| Same text against itself | 1.0000 | 1.0000 | duplicate ✓ |
+| Genuine duplicate, reworded | 0.9035 | 0.9518 | duplicate ✓ |
+| Hard negative — same place, same vocabulary, different problem | 0.7540 | 0.8770 | **not** duplicate ✓ |
+
+The hard negative ("school has no boundary wall, cattle wander in" vs "hand pump broken") is the case that matters: at raw cosine it is correctly rejected, but its Atlas score of 0.8770 clears a naive `score >= 0.82` check and would be wrongly merged.
+
+**This is one hand-built triplet, not a calibration.** It is enough to show 0.82-on-raw-cosine is in a sensible region and that the naive comparison is broken; it is not enough to set the threshold. The ~50-pair labelled set in §6 still has to do that.
 
 **Threshold calibration note:** 0.82 is a starting point, not a proven constant. This threshold is the single highest-risk parameter in the entire system for the live demo — it must be tuned against real test pairs (see §6) before demo day, not left at the default. Log every dedup decision (similarity score + outcome) during testing so the threshold can be adjusted with evidence, not guesswork.
 

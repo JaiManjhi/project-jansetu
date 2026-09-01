@@ -32,8 +32,8 @@ Two notes on those choices. The table below says "Next.js 14+" — 16 satisfies 
 | Animation | Framer Motion | Used sparingly — see `DESIGN.md` |
 | Database | MongoDB Atlas (M0 free tier) | Matches existing team familiarity; native vector search (Atlas Vector Search) and geospatial queries (`2dsphere`) both available on the free tier, so no second database is needed |
 | Auth | NextAuth.js | Email magic-link for citizens (optional), institution-domain-restricted credentials for University role, simple credential auth for Industry/Admin |
-| AI — embeddings | Google Gemini `text-embedding-004` (or current equivalent — verify exact model name at build time, this space moves fast) | Free tier is generous enough for hackathon-scale traffic |
-| AI — generation (classification, match reasoning) | Groq (Llama 3.x) as primary, Gemini Flash as fallback | Groq's inference speed matters specifically for the live demo — a 3-second classification delay on stage is a bad look; Groq's free tier is fast enough to feel instant |
+| AI — embeddings | Google `gemini-embedding-2` at `outputDimensionality: 768` | Verified live 2026-09-01. Returns unit-normalized vectors at 768 (`gemini-embedding-001` does not — see AI_ENGINE.md §2). `text-embedding-004` no longer exists |
+| AI — generation (classification, match reasoning) | Groq `openai/gpt-oss-120b` primary, `gemini-3.5-flash` fallback | Verified live 2026-09-01 at 724ms avg. **Groq no longer serves any Llama 3.x chat model.** Do not pin Gemini to a `-latest` alias — the newest Flash models return 503 on the free tier |
 | Voice input | Web Speech API (browser-native) as the default; AI4Bharat/Bhashini as an upgrade path if time permits | Web Speech API needs zero backend integration and zero API key — ship this first, upgrade only if Day 6-7 has slack |
 | Media storage | Cloudinary (free tier) | Photo/video upload for citizen submissions |
 | Maps | MapLibre GL JS + free OpenStreetMap tiles | No API key, no cost |

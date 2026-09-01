@@ -67,7 +67,7 @@ Database: MongoDB Atlas (free M0 tier). Collections below, each with fields, typ
 ```json
 {
   "fields": [
-    { "type": "vector", "path": "embedding", "numDimensions": 0, "similarity": "cosine" },
+    { "type": "vector", "path": "embedding", "numDimensions": 768, "similarity": "cosine" },
     { "type": "filter", "path": "district" },
     { "type": "filter", "path": "status" },
     { "type": "filter", "path": "createdAt" }
@@ -75,7 +75,7 @@ Database: MongoDB Atlas (free M0 tier). Collections below, each with fields, typ
 }
 ```
 
-`numDimensions` is a placeholder — replace it with the verified output dimension of the embedding model before creating the index (`AI_ENGINE.md §2`).
+`numDimensions: 768` matches `gemini-embedding-2` at `outputDimensionality: 768`, verified against the live API — see `AI_ENGINE.md §2` for why that model and that size.
 
 **The three `filter` entries are required, not optional.** The dedup query in `AI_ENGINE.md §3` filters on `district`, `status`, and `createdAt` inside `$vectorSearch`, and Atlas rejects a filter on any path the index did not declare as a filter field. This fails at *query* time, not at index-creation time — the index will create cleanly and look correct until the first dedup run.
 
@@ -122,7 +122,7 @@ Never accept `district` or `state` from the client, even as a hint — a client-
 **Indexes:**
 - `{ location: "2dsphere" }`
 - `{ state: 1 }`
-- Atlas Vector Search index named `institution_capability_index` on `capabilityEmbedding`, similarity `cosine`, same `numDimensions` as `problem_embedding_index` — problem and institution vectors are compared against each other, so they must come from the same model at the same dimension. No `filter` fields required; routing does not filter this search.
+- Atlas Vector Search index named `institution_capability_index` on `capabilityEmbedding`, similarity `cosine`, `numDimensions: 768`, identical to `problem_embedding_index` — problem and institution vectors are compared against each other, so they must come from the same model at the same dimension. No `filter` fields required; routing does not filter this search.
 - `departments[].embedding` is deliberately **not** indexed. Department selection happens in JS over the ~10 candidates already returned by the institution-level search, so it needs no second Atlas index and costs no extra API call.
 
 ---
