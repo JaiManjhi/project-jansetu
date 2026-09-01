@@ -1,0 +1,80 @@
+@import "tailwindcss";
+
+/*
+  Design tokens — DESIGN.md §2 (color), §3 (type), §4 (spacing).
+  Every value here is from the doc. Do not add a colour, a type size, or a
+  spacing step that DESIGN.md does not list; if a new one is genuinely needed,
+  add it to DESIGN.md first, then here.
+*/
+
+@theme {
+  /* §2 Color */
+  --color-ink-900: #14151a;
+  --color-ink-600: #4a4d57;
+  --color-ink-300: #9aa0ac;
+  --color-paper: #fafaf8;
+  --color-surface: #ffffff;
+  --color-border: #e4e4e0;
+  --color-accent: #c1571f;
+  --color-accent-subtle: #fdf1e7;
+  --color-success: #1e7a4c;
+  --color-warning: #b8860b;
+  --color-danger: #b3261e;
+
+  /* §3 Typography — Inter for UI/body, Fraunces for display headings only */
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-fraunces), ui-serif, Georgia, serif;
+
+  /* §3 Scale — 12/14/16/20/24/32/48. No sizes outside this scale. */
+  --text-xs: 0.75rem; /* 12 */
+  --text-sm: 0.875rem; /* 14 */
+  --text-base: 1rem; /* 16 */
+  --text-lg: 1.25rem; /* 20 */
+  --text-xl: 1.5rem; /* 24 */
+  --text-2xl: 2rem; /* 32 */
+  --text-3xl: 3rem; /* 48 */
+
+  /* §3 Line height — 1.5 body, 1.2 headings */
+  --text-xs--line-height: 1.5;
+  --text-sm--line-height: 1.5;
+  --text-base--line-height: 1.5;
+  --text-lg--line-height: 1.2;
+  --text-xl--line-height: 1.2;
+  --text-2xl--line-height: 1.2;
+  --text-3xl--line-height: 1.2;
+
+  /* §4 Spacing — 4px base. Steps: 4,8,12,16,24,32,48,64,96 */
+  --spacing: 0.25rem;
+
+  /* §5 Components — cards 12px, buttons 8px */
+  --radius-card: 0.75rem;
+  --radius-button: 0.5rem;
+}
+
+/*
+  §9 — inputs are 44px minimum touch target. Citizens are on phones,
+  often outdoors, often one-handed.
+*/
+@theme {
+  --size-touch: 2.75rem; /* 44px */
+}
+
+html {
+  background-color: var(--color-paper);
+}
+
+body {
+  background-color: var(--color-paper);
+  color: var(--color-ink-900);
+  font-family: var(--font-sans);
+}
+
+/*
+  §9 — visible focus rings in --accent on every interactive element.
+  Set globally so no component can quietly ship without one.
+*/
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
