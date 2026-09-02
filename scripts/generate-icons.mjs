@@ -15,7 +15,12 @@
 import { deflateSync } from "node:zlib";
 import { writeFileSync, mkdirSync } from "node:fs";
 
-const ACCENT = [0xc1, 0x57, 0x1f];
+// Sampled from the JanSetu logo: navy from the "Jan" wordmark and the bridge,
+// green from "Setu" and the riverbank. The app icon uses a navy ground so it
+// stays legible on both light and dark home screens — the logo itself sits on
+// white, which would vanish against a light background at 32px.
+const NAVY = [0x1f, 0x3f, 0x77];
+const GREEN = [0x3d, 0x9b, 0x35];
 const WHITE = [0xff, 0xff, 0xff];
 
 function crc32(buf) {
@@ -63,11 +68,23 @@ function encodePng(size, pixelAt) {
   ]);
 }
 
-/** A bridge: a deck spanning the width, two piers, and an arch beneath. */
+/**
+ * A bridge over water, echoing the JanSetu logo: navy ground, white deck and
+ * piers, green river beneath.
+ *
+ * Simplified on purpose. The full logo carries a bridge, four figures, a
+ * government building, a factory, gears and an arc — that is right for a
+ * header or a slide, and unreadable at 32px in a browser tab. The bridge is
+ * the load-bearing idea (Setu means bridge), so it is what survives the crop.
+ */
 function bridgeMark(x, y, size) {
   const u = size / 32; // design grid unit
   const gx = x / u;
   const gy = y / u;
+
+  // River: green band across the lower third, as in the logo. Checked first so
+  // it sits behind nothing — the piers stop above it.
+  if (gy >= 24.5) return GREEN;
 
   // Deck: horizontal bar across the middle.
   if (gy >= 14 && gy < 16.5 && gx >= 5 && gx < 27) return WHITE;
@@ -85,7 +102,7 @@ function bridgeMark(x, y, size) {
   const r = Math.sqrt(dx * dx + dy * dy);
   if (dy > 0 && r >= 5.5 && r < 7.5 && gy < 24) return WHITE;
 
-  return ACCENT;
+  return NAVY;
 }
 
 mkdirSync("public", { recursive: true });

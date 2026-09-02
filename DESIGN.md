@@ -24,6 +24,14 @@ Avoid a literal tricolor cliché (no saffron-white-green banding). Instead, a re
 | `--warning` | `#B8860B` | Pending, needs-review states |
 | `--danger` | `#B3261E` | Errors, high-severity flags |
 
+> **⚠ Open conflict — logo vs UI palette (recorded 2026-09-02).**
+>
+> The team adopted a logo built on navy `#1F3F77`, green `#3D9B35` and orange. The product UI is built on `--accent #C1571F` (terracotta), per the table above.
+>
+> **The app icons now use the logo's colours; the UI still uses terracotta.** That mismatch is deliberate and recorded, not an oversight. Resolving it means either accepting it — the logo appears in the header only — or migrating the tokens above to navy/green, which also means re-checking text contrast for AA and retuning the admin heatmap ramp, since that ramp is built around the terracotta. Decide before demo day and update this section either way, so the doc stops contradicting the product.
+>
+> Separately: §1 bans "stock illustration of generic diverse people", and the logo's circle-of-figures motif sits in that family. The logo is the team's decision; this note exists so the rule and the artwork are not silently at odds.
+
 Dark mode: invert to an ink-950 background (`#0E0F13`), not pure black. Ship dark mode only if Day 9-10 has slack — it is not required for the demo to succeed.
 
 ## 3. Typography
