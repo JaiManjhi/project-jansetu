@@ -393,6 +393,10 @@ const DIRECTORIES = [
   // header — hence header: 3 rather than 2.
   { file: "West_Bengal_Engineering_Institutions_Directory (1).xlsx", header: 3, inst: 0, place: 1, category: 2, dept: 3, res: 4, src: 5, placeIsState: false, fixedState: "West Bengal" },
   { file: "Uttar_Pradesh_Engineering_Institutions_Directory_website_links_fixed.xlsx", header: 3, inst: 0, place: 1, category: 2, dept: 3, res: 4, src: 5, placeIsState: false, fixedState: "Uttar Pradesh" },
+  // Header sits at row 2 here, and SECTION divider rows appear inside the
+  // data — they carry only a first cell, so the empty-department check skips
+  // them without needing a special rule.
+  { file: "maharashtra_only_institutions_directory.xlsx", header: 2, inst: 0, place: 1, category: 2, dept: 3, res: 4, src: 5, placeIsState: false, fixedState: "Maharashtra" },
 ];
 for (const spec of DIRECTORIES) {
   const path = at(spec.file);
