@@ -52,8 +52,8 @@ Consult `SETUP.md` before Day 1 — every account and key must exist first.
 
 ## Day 9 — University + Industry flows (simple, per PRD scope)
 
-- [ ] University: institution queue view, claim action, basic status update — no approval workflow, no versioning. The claim route does three writes and the completion route does one `$inc -1`, both spelled out in `API_SPEC.md`; skipping the `activeProjectCount` bookkeeping leaves the Day 3-5 routing penalty permanently zero and it will look like it works
-- [ ] Industry: browse claimed projects, pledge form
+- [x] University: queue view, claim action, status update. **Bookkeeping verified live:** claim took activeProjectCount 0→1, completion took it 1→0, and two further saves on an already-completed project left it at 0 rather than going negative.
+- [x] Industry: browse claimed projects, pledge form — verified end to end; pledge recorded and surfaced on the project. Copy states plainly that no money is taken (PRD §3).
 - [ ] Full integration pass — click through every flow end to end as if you were each of the four roles, fix what breaks
 - [ ] QA pass, ideally by a teammate who hasn't been staring at the code
 

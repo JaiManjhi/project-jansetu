@@ -37,7 +37,30 @@ function LoginForm() {
       return;
     }
 
-    router.push(params.get("callbackUrl") ?? "/admin");
+    /**
+     * Send each role to its own dashboard.
+     *
+     * This used to default to /admin, which then bounced any non-admin back to
+     * the citizen form — a coordinator signing in landed on the report-a-problem
+     * page with no clue why. The role is only known once the session exists, so
+     * it is read back before deciding where to go.
+     */
+    const callbackUrl = params.get("callbackUrl");
+    if (callbackUrl) {
+      router.push(callbackUrl);
+      router.refresh();
+      return;
+    }
+
+    const session: unknown = await fetch("/api/auth/session").then((r) => r.json()).catch(() => null);
+    const role =
+      typeof session === "object" && session !== null && "user" in session
+        ? (session as { user?: { role?: string } }).user?.role
+        : undefined;
+
+    router.push(
+      role === "admin" ? "/admin" : role === "university" ? "/university" : role === "industry" ? "/industry" : "/",
+    );
     router.refresh();
   }
 

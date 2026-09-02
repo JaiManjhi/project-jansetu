@@ -53,10 +53,14 @@ async function main(): Promise<void> {
   if (!uri) throw new Error("MONGODB_URI is not set — see SETUP.md");
   await mongoose.connect(uri, { bufferCommands: false });
 
-  // A university account needs an institution to belong to. If none is seeded
-  // yet, fall back to any institution rather than failing the whole script —
-  // institution data lands separately.
-  const anyInstitution = await Institution.findOne().select("_id name").lean();
+  // A university account needs an institution to belong to. Prefer one that
+  // actually matches the account email — coordinator@nitjsr.ac.in belongs at
+  // NIT Jamshedpur, and linking it to whichever institution happened to be
+  // first makes the demo nonsensical. Falls back to any institution rather
+  // than failing, since institution data lands separately.
+  const anyInstitution =
+    (await Institution.findOne({ name: /NIT Jamshedpur/i }).select("_id name").lean()) ??
+    (await Institution.findOne().select("_id name").lean());
 
   const printed: Array<[string, string, string]> = [];
 

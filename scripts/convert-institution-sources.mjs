@@ -287,7 +287,7 @@ const out = [];
 const unresolved = [];
 const at = (name) => join(resourcesDir, name);
 
-function push({ institution, state, district, type, department, research, source, category }) {
+function push({ institution, state, district, department, research, source, category }) {
   const inst = canonicalName(institution || "");
   const dept = (department || "").trim();
   if (!inst || !dept) return;
