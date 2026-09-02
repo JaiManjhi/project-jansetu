@@ -149,6 +149,22 @@ const CITY_TO_DISTRICT = {
   sonipat: "Sonipat",
   delhi: "New Delhi",
   "new delhi": "New Delhi",
+
+  // West Bengal. Almost none of these cities share a name with their district,
+  // and our district list uses the transliterations from the boundary data
+  // ("Haora", not "Howrah"; "Hugli", not "Hooghly").
+  howrah: "Haora",
+  kalyani: "Nadia",
+  serampore: "Hugli",
+  berhampore: "Murshidabad",
+  haldia: "Purba Medinipur",
+  barasat: "North Twenty-Four Parganas",
+  barrackpore: "North Twenty-Four Parganas",
+  bolpur: "Birbhum",
+  // Agarpara is in North 24 Parganas, not Kolkata proper, despite how the
+  // source labels it.
+  "agarpara, kolkata": "North Twenty-Four Parganas",
+  agarpara: "North Twenty-Four Parganas",
 };
 
 /** Cities that appear inside institution names, longest first so
@@ -190,11 +206,33 @@ const NAME_CANONICAL = {
   opjindaluniversityopju: "O.P. Jindal University",
   soauniversityiter: "SOA University (ITER)",
   kiitdeemedtobeuniversity: "KIIT University",
+
+  // West Bengal. The first is the same institution written out in full with
+  // its own abbreviation appended; the second is a typo in the source
+  // ("Haldi" for "Haldia") that would otherwise create a second institution
+  // holding half the departments.
+  iitkharagpur: "IIT Kharagpur",
+  indianinstituteoftechnologykharagpuriitkharagpur: "IIT Kharagpur",
+  haldiainstituteoftechnology: "Haldia Institute of Technology",
+  haldiinstituteoftechnology: "Haldia Institute of Technology",
 };
 
 const canonicalName = (raw) => {
   const key = raw.toLowerCase().replace(/[^a-z0-9]/g, "");
   return NAME_CANONICAL[key] ?? raw.trim();
+};
+
+/**
+ * State overrides.
+ *
+ * The source files label these "Delhi NCR / HR", which is a REGION, not a
+ * state. Both institutions physically sit in Sonipat, Haryana. Filing them
+ * under Delhi made the seeder search only Delhi's districts for Sonipat,
+ * find nothing, and skip both institutions entirely.
+ */
+const INSTITUTION_STATE_OVERRIDES = {
+  "ashoka university": "Haryana",
+  "o.p. jindal global university": "Haryana",
 };
 
 const INSTITUTION_DISTRICT_OVERRIDES = {
@@ -291,14 +329,15 @@ function push({ institution, state, district, department, research, source, cate
   const inst = canonicalName(institution || "");
   const dept = (department || "").trim();
   if (!inst || !dept) return;
-  const resolvedDistrict = district || resolveDistrict(inst, state, "");
+  const resolvedState = INSTITUTION_STATE_OVERRIDES[inst.toLowerCase()] ?? (state || "").trim();
+  const resolvedDistrict = district || resolveDistrict(inst, resolvedState, "");
   if (!resolvedDistrict) {
     unresolved.push(`${inst} (${state || "state unknown"})`);
     return;
   }
   out.push([
     inst,
-    (state || "").trim(),
+    resolvedState,
     resolvedDistrict,
     classifyType(inst, category),
     "deep",
@@ -348,6 +387,9 @@ for (const spec of PS43) {
 const DIRECTORIES = [
   { file: "Untitled (1).xlsx", header: 2, inst: 0, place: 1, category: 2, dept: 3, res: 4, src: 5, placeIsState: true },
   { file: "Untitled.xlsx", header: 2, inst: 0, place: 1, category: 2, dept: 3, res: 4, src: 5, placeIsState: false, fixedState: "Madhya Pradesh" },
+  // Same layout as the MP directory, but with an extra note row above the
+  // header — hence header: 3 rather than 2.
+  { file: "West_Bengal_Engineering_Institutions_Directory (1).xlsx", header: 3, inst: 0, place: 1, category: 2, dept: 3, res: 4, src: 5, placeIsState: false, fixedState: "West Bengal" },
 ];
 for (const spec of DIRECTORIES) {
   const path = at(spec.file);
