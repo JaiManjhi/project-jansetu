@@ -17,10 +17,10 @@ Consult `SETUP.md` before Day 1 — every account and key must exist first.
 
 ## Day 2 — Institution + district data
 
-- [ ] Source AISHE/AICTE open-data institution list (name, location, type) — write `scripts/seed-institutions.ts` to parse and bulk-insert as `dataDepth: "shallow"`
+- [x] Institution ingestion — `scripts/seed-institutions.mts` parses the CSV shape, groups rows per institution, resolves district names, and upserts. **Chhattisgarh loaded: 163 institutions (3 deep, 160 shallow), 29 departments.** Remaining states drop in with the same command.
 - [ ] Manually compile 40-60 "deep" institution profiles (real department names, real faculty research areas, sourced from public institution websites) — prioritize Jharkhand institutions, spread the rest across several states
 - [x] Build `data/districts.json` (one `{district, state, lat, lng}` per Indian district) and `lib/geo/district.ts` nearest-centroid lookup. **Done:** 788 districts, all 36 states/UTs, built by `scripts/build-districts.mts` from district boundary polygons; 8 tests in `tests/geo.test.mts`. Small, self-contained, and **blocks dedup** — dedup scopes by `district`, so until this exists every dedup query is scoped to an empty string and matches nothing. Sanity-check it with a handful of known coordinates (Ranchi, Jamshedpur, and one point deliberately near a district border) before trusting it
-- [ ] Run the embedding pipeline over every institution's `capabilityText` to populate `capabilityEmbedding`, **and** over each department's own text to populate `departments[].embedding` — the latter is what makes department selection and the load-balancing penalty work in Day 3-5 routing. Use the shallow-institution `capabilityText` fallback in `AI_ENGINE.md §2` for institutions with no departments; don't let them embed as a bare name
+- [x] Run the embedding pipeline over every institution's `capabilityText` to populate `capabilityEmbedding`, **and** over each department's own text to populate `departments[].embedding` — the latter is what makes department selection and the load-balancing penalty work in Day 3-5 routing. Use the shallow-institution `capabilityText` fallback in `AI_ENGINE.md §2` for institutions with no departments; don't let them embed as a bare name
 - [ ] Verify vector search actually returns sane results with a manual test query before moving on
 
 ## Day 3-5 — AI engine (the core, per `AI_ENGINE.md`)
