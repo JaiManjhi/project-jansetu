@@ -144,6 +144,7 @@ const CITY_TO_DISTRICT = {
   kanpur: "Kanpur Nagar",
   allahabad: "Prayagraj",
   "greater noida": "Gautam Buddha Nagar",
+  noida: "Gautam Buddha Nagar",
   bangalore: "Bengaluru (Urban)",
   bengaluru: "Bengaluru (Urban)",
   sonipat: "Sonipat",
@@ -203,6 +204,7 @@ const NAME_CANONICAL = {
   nifftranchi: "NIFFT Ranchi",
   sisterniveditauniversitysnu: "Sister Nivedita University",
   shivnadaruniversitysnu: "Shiv Nadar University",
+  shivnadaruniversitydelhincr: "Shiv Nadar University",
   opjindaluniversityopju: "O.P. Jindal University",
   soauniversityiter: "SOA University (ITER)",
   kiitdeemedtobeuniversity: "KIIT University",
@@ -390,6 +392,7 @@ const DIRECTORIES = [
   // Same layout as the MP directory, but with an extra note row above the
   // header — hence header: 3 rather than 2.
   { file: "West_Bengal_Engineering_Institutions_Directory (1).xlsx", header: 3, inst: 0, place: 1, category: 2, dept: 3, res: 4, src: 5, placeIsState: false, fixedState: "West Bengal" },
+  { file: "Uttar_Pradesh_Engineering_Institutions_Directory_website_links_fixed.xlsx", header: 3, inst: 0, place: 1, category: 2, dept: 3, res: 4, src: 5, placeIsState: false, fixedState: "Uttar Pradesh" },
 ];
 for (const spec of DIRECTORIES) {
   const path = at(spec.file);
