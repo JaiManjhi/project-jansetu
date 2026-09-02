@@ -40,7 +40,7 @@ Consult `SETUP.md` before Day 1 — every account and key must exist first.
 - [ ] Photo upload via Cloudinary
 - [x] Location: request GPS immediately on this step and pre-fill the pin the moment it resolves — do not wait for a tap. Show an equally-prominent "Set location manually" option beside the auto-detected pin (Zomato/Swiggy pattern, not a fallback-only path), letting the citizen drag the pin freely. Save `locationSource: "gps"|"manual"` and `locationAccuracyM` per `DATA_MODEL.md` — display a small "Using your current location" / "Location set manually" confirmation label so it's never ambiguous which was used. See `DESIGN.md §8` for the full UI spec.
 - [ ] PWA setup: manifest, service worker, IndexedDB submission queue for offline capability — test this by actually toggling airplane mode, not just reading the code
-- [ ] Public feed page with upvote
+- [x] Public feed page with upvote — includes `GET /api/problems/:id`, `PATCH`, and rate-limited `POST /api/problems/:id/upvote`
 - [x] The duplicate-detected UI moment — per `DESIGN.md §7`, this deserves a deliberate transition, it's your best demo beat
 
 ## Day 8 — Admin dashboard
