@@ -45,3 +45,25 @@ export function requireEnv(name: "GEMINI_API_KEY" | "GROQ_API_KEY"): string {
   if (!v) throw new Error(`${name} is not set — see SETUP.md`);
   return v;
 }
+
+/**
+ * Every Gemini key available, in order.
+ *
+ * The free tier's daily embedding quota is the binding constraint on this
+ * project: a single institution-seeding run exhausts one key's allowance, and
+ * an institution without a vector is invisible to routing. Keys from separate
+ * Google projects have separate quotas, so the practical fix is to hold more
+ * than one and move to the next when the current one returns 429.
+ *
+ * Reads GEMINI_API_KEY, then GEMINI_API_KEY_2, _3, … so adding headroom is an
+ * env change and nothing else. Order is stable, so the first key is always
+ * drained before the second is touched — that keeps behaviour predictable and
+ * makes "how much is left" a question about one key at a time.
+ */
+export function geminiKeys(): string[] {
+  const keys = [process.env.GEMINI_API_KEY];
+  for (let i = 2; i <= 5; i++) keys.push(process.env[`GEMINI_API_KEY_${i}`]);
+  const present = keys.filter((k): k is string => Boolean(k && k.trim()));
+  if (present.length === 0) throw new Error("No GEMINI_API_KEY is set — see SETUP.md");
+  return present;
+}

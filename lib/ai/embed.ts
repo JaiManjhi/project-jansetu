@@ -3,7 +3,7 @@ import {
   EMBEDDING_MODEL,
   GEMINI_BASE,
   TIMEOUTS,
-  requireEnv,
+  geminiKeys,
 } from "./models.ts";
 
 /**
@@ -62,32 +62,48 @@ export async function embedText(text: string): Promise<number[]> {
   const trimmed = text.trim();
   if (!trimmed) throw new EmbeddingUnavailableError("empty text");
 
-  const apiKey = requireEnv("GEMINI_API_KEY");
+  /**
+   * Try each configured key in turn, moving on only when one is rate limited.
+   *
+   * Keys from separate Google projects have separate daily quotas, and that
+   * quota is the binding constraint here — a single seeding run drains one
+   * key. Any other error (a bad key, a malformed request) fails immediately
+   * rather than being retried against every key, because trying a second key
+   * cannot fix a request that was itself wrong.
+   */
+  const keys = geminiKeys();
+  let lastRateLimitBody = "";
 
-  let response: Response;
-  try {
-    response = await fetch(`${GEMINI_BASE}/${EMBEDDING_MODEL}:embedContent`, {
-      method: "POST",
-      headers: { "x-goog-api-key": apiKey, "content-type": "application/json" },
-      body: JSON.stringify({
-        content: { parts: [{ text: trimmed }] },
-        outputDimensionality: EMBEDDING_DIMENSIONS,
-      }),
-      signal: AbortSignal.timeout(TIMEOUTS.embedMs),
-    });
-  } catch (error: unknown) {
-    const reason = error instanceof Error ? error.message : String(error);
-    throw new EmbeddingUnavailableError(`network/timeout — ${reason}`);
-  }
+  for (const apiKey of keys) {
+    let response: Response;
+    try {
+      response = await fetch(`${GEMINI_BASE}/${EMBEDDING_MODEL}:embedContent`, {
+        method: "POST",
+        headers: { "x-goog-api-key": apiKey, "content-type": "application/json" },
+        body: JSON.stringify({
+          content: { parts: [{ text: trimmed }] },
+          outputDimensionality: EMBEDDING_DIMENSIONS,
+        }),
+        signal: AbortSignal.timeout(TIMEOUTS.embedMs),
+      });
+    } catch (error: unknown) {
+      const reason = error instanceof Error ? error.message : String(error);
+      throw new EmbeddingUnavailableError(`network/timeout — ${reason}`);
+    }
 
-  if (!response.ok) {
+    if (response.ok) return parseVector(await response.json());
+
     const body = await response.text().catch(() => "");
-    throw new EmbeddingUnavailableError(
-      `HTTP ${response.status} ${body.slice(0, 200)}`,
-    );
+    if (response.status === 429) {
+      lastRateLimitBody = body.slice(0, 200);
+      continue; // this key is spent for today; try the next
+    }
+    throw new EmbeddingUnavailableError(`HTTP ${response.status} ${body.slice(0, 200)}`);
   }
 
-  return parseVector(await response.json());
+  throw new EmbeddingUnavailableError(
+    `HTTP 429 — all ${keys.length} Gemini key(s) rate limited. ${lastRateLimitBody}`,
+  );
 }
 
 /**

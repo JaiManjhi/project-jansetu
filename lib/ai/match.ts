@@ -234,16 +234,47 @@ export async function matchProblem(
     let matchedExpertise: string[] = [];
     let activeProjectCount = 0;
     let bestDepartmentSimilarity = -Infinity;
+    let fallbackDepartment: string | null = null;
+    let fallbackSimilarity = -Infinity;
 
     for (const department of candidate.departments) {
       if (department.embedding.length !== embedding.length) continue;
       const departmentSimilarity = cosineSimilarity(embedding, department.embedding);
-      if (departmentSimilarity > bestDepartmentSimilarity) {
-        bestDepartmentSimilarity = departmentSimilarity;
-        matchedDepartment = department.name;
-        matchedExpertise = department.facultyExpertise;
-        activeProjectCount = department.activeProjectCount;
+
+      /**
+       * Only departments with real expertise text can RAISE a score.
+       *
+       * A bare department name is a label, not a capability. Worse, short
+       * generic strings sit near everything in embedding space: measured on
+       * this data, a name-only "Mathematics" scored 0.6202 against a
+       * contaminated-water problem while NIT Raipur's Civil Engineering — which
+       * actually lists "Water Resources Development and Irrigation
+       * Engineering" — scored 0.5802. Letting bare names compete promotes
+       * institutions we know least about over the ones we know most about,
+       * which is exactly backwards.
+       *
+       * Name-only departments are still eligible to be NAMED as the matched
+       * department when nothing better exists, so the reason line can say
+       * something true; they simply cannot inflate the ranking.
+       */
+      if (department.facultyExpertise.length > 0) {
+        if (departmentSimilarity > bestDepartmentSimilarity) {
+          bestDepartmentSimilarity = departmentSimilarity;
+          matchedDepartment = department.name;
+          matchedExpertise = department.facultyExpertise;
+          activeProjectCount = department.activeProjectCount;
+        }
+      } else if (departmentSimilarity > fallbackSimilarity) {
+        fallbackSimilarity = departmentSimilarity;
+        fallbackDepartment = department.name;
       }
+    }
+
+    // No department has expertise on record — name the closest one anyway, but
+    // score on the institution vector alone.
+    if (matchedDepartment === null && fallbackDepartment !== null) {
+      matchedDepartment = fallbackDepartment;
+      matchedExpertise = [];
     }
 
     /**
