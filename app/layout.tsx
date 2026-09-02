@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, Fraunces } from "next/font/google";
 import "./globals.css";
+import { SiteHeader } from "@/components/ui/SiteHeader";
 
 // DESIGN.md §3 — Inter for UI/body, one distinct display face for section
 // headers only. Fraunces is the doc's own suggestion; used at 20px and above.
@@ -47,7 +48,10 @@ export default function RootLayout({
       lang="en"
       className={`${inter.variable} ${fraunces.variable} h-full antialiased`}
     >
-      <body className="flex min-h-full flex-col">{children}</body>
+      <body className="flex min-h-full flex-col">
+        <SiteHeader />
+        {children}
+      </body>
     </html>
   );
 }

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { isValidObjectId } from "mongoose";
 import { connectToDatabase } from "@/lib/db";
 import { Problem } from "@/models/Problem";
+import { Project } from "@/models/Project";
 import { requireRole, AuthError } from "@/lib/auth";
 import { PROBLEM_STATUS_ENUM } from "@/lib/constants";
 import { z } from "zod";
@@ -46,11 +47,34 @@ export async function PATCH(
     return errorResponse("Not a valid problem id.", "INVALID_ID", 400);
   }
 
+  let user;
   try {
-    await requireRole("university", "admin");
+    user = await requireRole("university", "admin");
   } catch (error: unknown) {
     if (error instanceof AuthError) return errorResponse(error.message, error.code, error.status);
     throw error;
+  }
+
+  /**
+   * API_SPEC.md: "auth: university (must own the claim) or admin".
+   *
+   * The role check alone was NOT enough — any signed-in coordinator could
+   * change the status of any problem in the country, including one claimed by
+   * a different institution. Ownership is proven by a project on this problem
+   * belonging to the caller's institution.
+   */
+  if (user.role === "university") {
+    await connectToDatabase();
+    const owned = await Project.findOne({ problemId: id, institutionId: user.institutionId })
+      .select("_id")
+      .lean();
+    if (!owned) {
+      return errorResponse(
+        "You can only update problems your institution has claimed.",
+        "FORBIDDEN",
+        403,
+      );
+    }
   }
 
   let body: unknown;

@@ -9,6 +9,7 @@ import { findDuplicate } from "@/lib/ai/dedup";
 import { matchProblem, type MatchResult } from "@/lib/ai/match";
 import { Match } from "@/models/Match";
 import { getSessionUser } from "@/lib/auth";
+import { rateLimit, clientIp } from "@/lib/rate-limit";
 
 /**
  * POST /api/problems — public. API_SPEC.md.
@@ -25,7 +26,35 @@ function errorResponse(message: string, code: string, status: number) {
   return NextResponse.json({ error: message, code }, { status });
 }
 
+/**
+ * Rate limit for the public submission route — ARCHITECTURE.md §8 requires it
+ * and it was missing.
+ *
+ * This is the one unauthenticated route that spends money on every call: each
+ * submission makes an embedding call, a classification call and up to three
+ * reason-generation calls. Free-tier quota is the binding constraint on this
+ * whole project, so an unbounded public endpoint is not just an abuse vector,
+ * it is a way to lose the demo.
+ *
+ * 20/hour is far above what any real citizen does and well below what a script
+ * can burn. ⚠ It is per IP, so a whole venue behind one NAT shares the budget —
+ * worth remembering on demo day.
+ */
+const SUBMIT_LIMIT = 20;
+const SUBMIT_WINDOW_MS = 60 * 60 * 1000;
+
 export async function POST(request: Request) {
+  const limit = rateLimit(`submit:${clientIp(request)}`, SUBMIT_LIMIT, SUBMIT_WINDOW_MS);
+  if (!limit.allowed) {
+    return NextResponse.json(
+      {
+        error: "Too many reports from this device. Please try again later.",
+        code: "RATE_LIMITED",
+      },
+      { status: 429, headers: { "retry-after": String(limit.retryAfterSeconds) } },
+    );
+  }
+
   let body: unknown;
   try {
     body = await request.json();
