@@ -18,6 +18,12 @@ const fraunces = Fraunces({
 
 export const metadata: Metadata = {
   title: "JanSetu",
+  manifest: "/manifest.json",
+  appleWebApp: { capable: true, title: "JanSetu", statusBarStyle: "default" },
+  icons: {
+    icon: [{ url: "/icon-192.png", sizes: "192x192", type: "image/png" }],
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180" }],
+  },
   description:
     "Report a local problem. It reaches the university best equipped to solve it.",
 };

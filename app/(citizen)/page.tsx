@@ -1,11 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { LoaderCircle } from "lucide-react";
+import { LoaderCircle, WifiOff, Clock } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { VoiceInput } from "@/components/citizen/VoiceInput";
 import { LocationPicker, type LocationValue } from "@/components/citizen/LocationPicker";
 import { SubmissionResult, type SubmissionResponse } from "@/components/citizen/SubmissionResult";
+import { useOfflineQueue, ServiceWorkerRegistrar } from "@/components/citizen/OfflineQueueProvider";
+import { enqueue, isSupported as queueSupported } from "@/lib/offline-queue";
 
 /**
  * Citizen submission — DESIGN.md §8.
@@ -25,6 +27,8 @@ export default function ReportProblemPage() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<SubmissionResponse | null>(null);
+  const [queuedNotice, setQueuedNotice] = useState(false);
+  const { online, queued, flushing, refresh } = useOfflineQueue();
 
   const tooShort = description.trim().length < MIN_DESCRIPTION;
   const canSubmit = !tooShort && location !== null && !submitting;
@@ -35,20 +39,35 @@ export default function ReportProblemPage() {
 
     setSubmitting(true);
     setError(null);
+    setQueuedNotice(false);
+
+    const payload = {
+      description: description.trim(),
+      language,
+      location: { lat: location.lat, lng: location.lng },
+      locationSource: location.source,
+      ...(location.source === "gps" && location.accuracyM !== null
+        ? { locationAccuracyM: location.accuracyM }
+        : {}),
+      mediaUrls: [] as string[],
+    };
+
+    // Known offline: queue without attempting the request. PRD §6 — the
+    // report is kept, not lost, and the citizen is told so plainly.
+    if (!online && queueSupported()) {
+      await enqueue(payload);
+      await refresh();
+      setQueuedNotice(true);
+      setDescription("");
+      setSubmitting(false);
+      return;
+    }
+
     try {
       const response = await fetch("/api/problems", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({
-          description: description.trim(),
-          language,
-          location: { lat: location.lat, lng: location.lng },
-          locationSource: location.source,
-          ...(location.source === "gps" && location.accuracyM !== null
-            ? { locationAccuracyM: location.accuracyM }
-            : {}),
-          mediaUrls: [],
-        }),
+        body: JSON.stringify(payload),
       });
 
       const body: unknown = await response.json();
@@ -62,11 +81,20 @@ export default function ReportProblemPage() {
       }
       setResult(body as SubmissionResponse);
     } catch {
-      // Offline or unreachable. The IndexedDB queue lands next; until then be
-      // honest rather than pretending the report was saved.
-      setError(
-        "Could not send your report — you may be offline. Please try again when you have a connection.",
-      );
+      // The connection dropped mid-request. Queue rather than lose it, and only
+      // claim it was saved if the queue actually accepted it.
+      if (queueSupported()) {
+        try {
+          await enqueue(payload);
+          await refresh();
+          setQueuedNotice(true);
+          setDescription("");
+        } catch {
+          setError("Could not send or save your report. Please try again when you have a connection.");
+        }
+      } else {
+        setError("Could not send your report — you may be offline. Please try again when you have a connection.");
+      }
     } finally {
       setSubmitting(false);
     }
@@ -88,6 +116,44 @@ export default function ReportProblemPage() {
           placed to work on it. No account needed.
         </p>
       </header>
+
+      <ServiceWorkerRegistrar />
+
+      {/* PRD §6 — offline must be visible before the citizen writes anything,
+          not sprung on them at submit time. */}
+      {!online && (
+        <p
+          className="mt-6 flex items-start gap-2 rounded-button border border-warning/30 bg-warning/5 p-3 text-sm text-warning"
+          role="status"
+        >
+          <WifiOff size={16} strokeWidth={1.5} className="mt-0.5 shrink-0" aria-hidden />
+          <span>
+            You are offline. You can still fill this in — your report is saved
+            on this device and sent automatically when you are back online.
+          </span>
+        </p>
+      )}
+
+      {/* PRD §6 — the "queued, will send" state, stated plainly. */}
+      {queuedNotice && (
+        <div className="mt-6 rounded-card border border-border bg-surface p-4">
+          <p className="flex items-start gap-2 text-base text-ink-900">
+            <Clock size={20} strokeWidth={1.5} className="mt-0.5 shrink-0 text-warning" aria-hidden />
+            <span>Saved on this device — it will send by itself.</span>
+          </p>
+          <p className="mt-2 text-sm text-ink-600">
+            Your report is safe. You do not need to do anything: it goes out as
+            soon as you have a connection, even if you close this page.
+          </p>
+        </div>
+      )}
+
+      {queued > 0 && !queuedNotice && (
+        <p className="mt-6 text-sm text-ink-600" role="status">
+          {queued} {queued === 1 ? "report is" : "reports are"} waiting to send
+          {flushing ? " — sending now…" : online ? "" : " — will send when you are back online"}.
+        </p>
+      )}
 
       {result ? (
         <div className="mt-8">
