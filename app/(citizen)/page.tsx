@@ -8,6 +8,7 @@ import { LocationPicker, type LocationValue } from "@/components/citizen/Locatio
 import { SubmissionResult, type SubmissionResponse } from "@/components/citizen/SubmissionResult";
 import { useOfflineQueue, ServiceWorkerRegistrar } from "@/components/citizen/OfflineQueueProvider";
 import { enqueue, isSupported as queueSupported } from "@/lib/offline-queue";
+import { PhotoUpload } from "@/components/citizen/PhotoUpload";
 
 /**
  * Citizen submission — DESIGN.md §8.
@@ -24,6 +25,7 @@ export default function ReportProblemPage() {
   const [description, setDescription] = useState("");
   const [language, setLanguage] = useState("en");
   const [location, setLocation] = useState<LocationValue | null>(null);
+  const [mediaUrls, setMediaUrls] = useState<string[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<SubmissionResponse | null>(null);
@@ -49,7 +51,7 @@ export default function ReportProblemPage() {
       ...(location.source === "gps" && location.accuracyM !== null
         ? { locationAccuracyM: location.accuracyM }
         : {}),
-      mediaUrls: [] as string[],
+      mediaUrls,
     };
 
     // Known offline: queue without attempting the request. PRD §6 — the
@@ -59,6 +61,7 @@ export default function ReportProblemPage() {
       await refresh();
       setQueuedNotice(true);
       setDescription("");
+      setMediaUrls([]);
       setSubmitting(false);
       return;
     }
@@ -89,6 +92,7 @@ export default function ReportProblemPage() {
           await refresh();
           setQueuedNotice(true);
           setDescription("");
+          setMediaUrls([]);
         } catch {
           setError("Could not send or save your report. Please try again when you have a connection.");
         }
@@ -103,6 +107,7 @@ export default function ReportProblemPage() {
   function reset() {
     setResult(null);
     setDescription("");
+    setMediaUrls([]);
     setError(null);
   }
 
@@ -213,6 +218,16 @@ export default function ReportProblemPage() {
                   {option.label}
                 </button>
               ))}
+            </div>
+          </section>
+
+          <section>
+            <span className="block text-base font-medium text-ink-900">Add a photo (optional)</span>
+            <p className="mt-1 text-sm text-ink-600">
+              A picture helps the people who will work on this understand it faster.
+            </p>
+            <div className="mt-3">
+              <PhotoUpload urls={mediaUrls} onChange={setMediaUrls} disabled={submitting} />
             </div>
           </section>
 

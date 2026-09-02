@@ -68,6 +68,33 @@ Increment `upvoteCount`. Simple rate-limit by IP/session to prevent trivial abus
 
 ---
 
+## Media
+
+### `POST /api/media/sign` — **public**, rate-limited
+Returns a short-lived Cloudinary upload signature so the browser can upload **directly to Cloudinary**, and the file bytes never pass through our server.
+
+**Response `200`:**
+```json
+{
+  "cloudName": "string",
+  "apiKey": "string",
+  "timestamp": 0,
+  "folder": "jansetu/problems",
+  "signature": "string"
+}
+```
+
+Two reasons it is built this way rather than proxying the upload:
+
+- `CLOUDINARY_API_SECRET` must never reach the browser. Signing server-side and uploading client-side is Cloudinary's documented pattern for exactly this.
+- A citizen photographing a broken hand pump is uploading a multi-megabyte phone image over a rural connection. Routing that through a Vercel function burns the request body limit and the function timeout for no benefit — the bytes should go straight to Cloudinary.
+
+The signature covers `folder` and `timestamp` only, and Cloudinary rejects it after ~1 hour. It authorises *an* upload into the problems folder, nothing more; it is not a credential and grants no read or delete access.
+
+Rate-limited per IP, since an unauthenticated signing endpoint is otherwise an open invitation to use the account's storage quota.
+
+---
+
 ## Institutions
 
 ### `GET /api/institutions` — **public**
