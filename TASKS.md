@@ -39,7 +39,7 @@ Consult `SETUP.md` before Day 1 — every account and key must exist first.
 - [x] Wire Web Speech API for voice input, with visible transcription the citizen can edit before submit
 - [ ] Photo upload via Cloudinary
 - [x] Location: request GPS immediately on this step and pre-fill the pin the moment it resolves — do not wait for a tap. Show an equally-prominent "Set location manually" option beside the auto-detected pin (Zomato/Swiggy pattern, not a fallback-only path), letting the citizen drag the pin freely. Save `locationSource: "gps"|"manual"` and `locationAccuracyM` per `DATA_MODEL.md` — display a small "Using your current location" / "Location set manually" confirmation label so it's never ambiguous which was used. See `DESIGN.md §8` for the full UI spec.
-- [x] PWA setup: manifest, service worker, IndexedDB submission queue. **Note:** offline was simulated (navigator.onLine override + real network failure), not literal airplane mode, and the full offline→online→sent round trip is still unverified because Atlas was unreachable during the build. Re-run on a device before demo day.
+- [x] PWA setup: manifest, service worker, IndexedDB submission queue. **Round trip verified 2026-09-02:** offline submit → queued in IndexedDB → reconnect → auto-flushed with no user action → reached the server and classified. **Caveat:** offline was simulated via a navigator.onLine override, not literal airplane mode — repeat on a real device before demo day.
 - [x] Public feed page with upvote — includes `GET /api/problems/:id`, `PATCH`, and rate-limited `POST /api/problems/:id/upvote`
 - [x] The duplicate-detected UI moment — per `DESIGN.md §7`, this deserves a deliberate transition, it's your best demo beat
 
