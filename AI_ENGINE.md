@@ -161,9 +161,22 @@ Ties in the sweep are broken toward the **higher** threshold, because the two er
 **Trigger:** after a problem is confirmed non-duplicate and classified.
 
 **Algorithm:**
-1. Run `$vectorSearch` on `institution_capability_index` against the problem's embedding, retrieve top 10 candidates by raw similarity
+1. Run `$vectorSearch` on `institution_capability_index` against the problem's embedding, retrieve top **50** candidates by raw similarity
+
+> **Amended 2026-09-02, with measurements.** This step said "top 10", and step 3 scored on the institution vector alone. Both were wrong in the same way, and the fix is in steps 1 and 3 together.
+>
+> `capabilityEmbedding` averages every department into one vector, which penalises exactly the institutions this platform exists to find. Measured against the seeded Chhattisgarh data (163 institutions, 3 with real department profiles), for the problem *"drinking water pipeline leaking for weeks, supply contaminated"*:
+>
+> | Ranking method | Top result | First institution with real capability data |
+> |---|---|---|
+> | Institution vector only | a polytechnic with no profile | **#23** |
+> | max(institution, best department) | IGKV — Horticulture | **#1** |
+>
+> NIT Raipur ranked **#58 of 163** on its institution vector. It lists fifteen departments, but only three have written-up research areas and all three are computing, so its average vector sits far from a water problem — below polytechnics whose entire profile is `"<name> — technical institute in <district>"`. Its Civil Engineering department vector is a much better answer than its institution average.
+>
+> A pool of 10 could never have recovered that: #23 and #58 are outside it, so widening retrieval is as necessary as re-scoring. Capability lives in departments; the institution vector is only a summary, and when the summary and the specific disagree, trust the specific.
 2. For each candidate, compute distance in km between `problem.location` and `institution.location` (haversine formula — no external routing API needed for this scoring step, straight-line distance is a fine proxy)
-3. Compute combined score: `finalScore = (0.7 * cosineSimilarity) - (0.3 * normalizedDistancePenalty)`, where `normalizedDistancePenalty = min(distanceKm / 300, 1)` — i.e. distance penalty saturates at 300km so a very distant but perfect-match institution isn't unfairly zeroed out, but proximity meaningfully matters within a few hundred km
+3. Compute combined score: `finalScore = (0.7 * capabilitySimilarity) - (0.3 * normalizedDistancePenalty)`, where `capabilitySimilarity = max(institutionCosine, bestDepartmentCosine)` — see the amendment under step 1, where `normalizedDistancePenalty = min(distanceKm / 300, 1)` — i.e. distance penalty saturates at 300km so a very distant but perfect-match institution isn't unfairly zeroed out, but proximity meaningfully matters within a few hundred km
 4. **Select the matched department.** The vector search above ranks *institutions*, so nothing about it identifies which department matched — that has to be computed. For each candidate, take the cosine similarity between the problem's embedding and each entry in `departments[].embedding`, and pick the highest-scoring department. This is plain arithmetic over ~5 stored vectors per candidate: no Atlas index, no API call, negligible latency. Store the winner's name on `matches.matchedDepartment`. For shallow institutions, `departments` is empty — set `matchedDepartment: null` and skip step 5.
 5. Apply a minor penalty for that department's `activeProjectCount`, to avoid overloading the same popular faculty: `finalScore -= min(0.02 * activeProjectCount, 0.1)`. The cap is what keeps this a tie-breaker rather than the dominant term — without it, a department with 40 active projects would be pushed below genuinely irrelevant institutions.
 6. Sort by `finalScore` descending, take top 3

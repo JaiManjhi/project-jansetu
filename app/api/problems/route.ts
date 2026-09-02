@@ -6,14 +6,15 @@ import { resolveDistrict, toGeoPoint, isWithinIndia } from "@/lib/geo/district";
 import { embedText, EmbeddingUnavailableError } from "@/lib/ai/embed";
 import { classifyProblem, ClassificationUnavailableError } from "@/lib/ai/classify";
 import { findDuplicate } from "@/lib/ai/dedup";
+import { matchProblem, type MatchResult } from "@/lib/ai/match";
+import { Match } from "@/models/Match";
 import { getSessionUser } from "@/lib/auth";
 
 /**
  * POST /api/problems — public. API_SPEC.md.
  *
- * Runs the pipeline from ARCHITECTURE.md §6: validate → GeoJSON → district →
- * save → embed → dedup → classify. Matching (step 7) is not wired yet; it
- * needs institution data, so `matches` is currently always empty.
+ * Runs the full pipeline from ARCHITECTURE.md §6: validate → GeoJSON →
+ * district → save → embed → dedup → classify → match.
  *
  * The governing rule for this route: a submission is never lost. The doc is
  * written before any AI call, and every downstream failure degrades to
@@ -161,17 +162,38 @@ export async function POST(request: Request) {
   }
 
   // ---- route ----------------------------------------------------------
-  // TODO(Day 2 data): lib/ai/match.ts needs seeded institutions. Until then
-  // there is nothing to route to, and the problem stays unrouted rather than
-  // being marked "routed" with an empty match list, which would misreport it
-  // on the admin dashboard.
-  const matches: never[] = [];
+  // Only runs with an embedding and a category — matching compares vectors and
+  // the reason prompt states the category. Failure here is non-fatal: the
+  // problem is still saved and simply stays unrouted.
+  let matches: MatchResult[] = [];
+  if (embedding && problem.category) {
+    try {
+      matches = await matchProblem(embedding, lat, lng, input.description, problem.category);
+      if (matches.length > 0) {
+        await Match.deleteMany({ problemId: problem._id });
+        await Match.insertMany(
+          matches.map((m) => ({
+            problemId: problem._id,
+            institutionId: m.institutionId,
+            score: m.score,
+            distanceKm: m.distanceKm,
+            matchedDepartment: m.matchedDepartment,
+            reason: m.reason,
+            rank: m.rank,
+          })),
+        );
+      }
+    } catch (error: unknown) {
+      console.error(
+        `[problems] matching failed for ${problem._id.toString()}: ${error instanceof Error ? error.message : error}`,
+      );
+    }
+  }
 
   problem.needsReview = needsReview;
-  // "routed" means routed TO something. With matching unbuilt there are no
-  // matches, so claiming "routed" would tell the Day 8 admin dashboard that
-  // problems reached institutions that do not exist yet. Once match.ts lands
-  // and returns candidates, this becomes true on its own.
+  // "routed" means routed TO something. A problem with no matches — because
+  // no institution is seeded for its area, or matching failed — stays
+  // "processing" rather than claiming an institution received it.
   problem.status = needsReview || matches.length === 0 ? "processing" : "routed";
   await problem.save();
 
