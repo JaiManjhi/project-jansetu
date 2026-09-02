@@ -45,10 +45,10 @@ Consult `SETUP.md` before Day 1 — every account and key must exist first.
 
 ## Day 8 — Admin dashboard
 
-- [ ] `GET /api/admin/stats` and `GET /api/admin/heatmap` implemented
-- [ ] MapLibre heatmap rendering real submitted-problem coordinates
-- [ ] Category breakdown chart, institution activity table
-- [ ] This is the module that shows off the all-India scope decision — make sure the map convincingly shows spread across multiple states, not just Jharkhand
+- [x] `GET /api/admin/stats` and `GET /api/admin/heatmap` implemented — both admin-only, verified 401 unauthenticated
+- [x] MapLibre heatmap rendering real submitted-problem coordinates — heat layer at national zoom, per-point circles above zoom 6 distinguishing GPS-verified (filled) from manually placed (hollow), per DESIGN.md §8
+- [x] Category breakdown chart, institution activity table — **caveat:** the institution table renders an explicit empty state, because no institutions are seeded yet. It will rank by claimed problems once the data lands.
+- [x] This is the module that shows off the all-India scope decision — 150 demo problems across **20 states/UTs** via `npm run seed:demo`, Jharkhand-weighted but visibly national
 
 ## Day 9 — University + Industry flows (simple, per PRD scope)
 

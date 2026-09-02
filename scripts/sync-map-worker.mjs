@@ -16,13 +16,33 @@
  */
 import { copyFileSync, mkdirSync, existsSync } from "node:fs";
 
-const SRC = "node_modules/maplibre-gl/dist/maplibre-gl-worker.mjs";
-const DEST = "public/maplibre-gl-worker.mjs";
+/**
+ * BOTH files are required, and that is the whole point of this list.
+ *
+ * maplibre-gl-worker.mjs is not self-contained: it does
+ * `import ... from "./maplibre-gl-shared.mjs"`. Copying only the worker gives
+ * a file that serves with a 200 and the right MIME type and then dies on
+ * startup because its sibling import 404s. MapLibre reports nothing — the
+ * GeoJSON source simply never finishes loading (isSourceLoaded stays false,
+ * no error event), so a heatmap renders empty over perfectly good data.
+ *
+ * The raster basemap keeps working throughout, because raster tiles are
+ * fetched on the main thread. That is what makes this failure so quiet: the
+ * map looks fine and only the data is missing.
+ */
+const FILES = [
+  "maplibre-gl-worker.mjs",
+  "maplibre-gl-shared.mjs", // imported by the worker — do not drop this
+];
 
-if (!existsSync(SRC)) {
-  console.warn(`[sync-map-worker] ${SRC} not found — skipping (is maplibre-gl installed?)`);
-  process.exit(0);
-}
 mkdirSync("public", { recursive: true });
-copyFileSync(SRC, DEST);
-console.log(`[sync-map-worker] ${SRC} -> ${DEST}`);
+
+for (const file of FILES) {
+  const src = `node_modules/maplibre-gl/dist/${file}`;
+  if (!existsSync(src)) {
+    console.warn(`[sync-map-worker] ${src} not found — skipping (is maplibre-gl installed?)`);
+    continue;
+  }
+  copyFileSync(src, `public/${file}`);
+  console.log(`[sync-map-worker] ${src} -> public/${file}`);
+}

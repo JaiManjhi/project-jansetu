@@ -16,7 +16,9 @@
     "sync:map-worker": "node scripts/sync-map-worker.mjs",
     "postinstall": "node scripts/sync-map-worker.mjs",
     "prebuild": "node scripts/sync-map-worker.mjs",
-    "gen:icons": "node scripts/generate-icons.mjs"
+    "gen:icons": "node scripts/generate-icons.mjs",
+    "seed:users": "node --env-file=.env.local scripts/seed-users.mts",
+    "seed:demo": "node --env-file=.env.local scripts/seed-demo-problems.mts"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",

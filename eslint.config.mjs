@@ -15,6 +15,7 @@ const eslintConfig = defineConfig([
     // Vendored MapLibre worker bundle, copied by scripts/sync-map-worker.mjs.
     // Third-party build output — not ours to lint.
     "public/maplibre-gl-worker.mjs",
+    "public/maplibre-gl-shared.mjs",
   ]),
 ]);
 
