@@ -42,3 +42,7 @@ next-env.d.ts
 
 # env — keep the example committed, never the real one
 !.env.example
+
+# Scratch files from debugging sessions
+*.tmp.mjs
+*.tmp.mts
