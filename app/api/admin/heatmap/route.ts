@@ -14,6 +14,17 @@ import { CATEGORY_ENUM } from "@/lib/constants";
  * should be able to tell them apart without opening every record.
  */
 
+/**
+ * Vercel kills a function at its maxDuration and replaces the response with a
+ * generic platform error. The default is 10s, and this route legitimately
+ * needs longer: connect (up to 5s) + embed (10s) + dedup + classify (15s, and
+ * again on the Gemini fallback) + matching with three reason calls. A typical
+ * submission finishes in 4-5s, but one slow provider on demo day would be cut
+ * off mid-flight — losing the careful degradation in AI_ENGINE.md §7, which
+ * exists precisely so a citizen never loses a report.
+ */
+export const maxDuration = 60;
+
 const QuerySchema = z.object({
   category: z.enum(CATEGORY_ENUM).optional(),
   dateFrom: z.iso.datetime().optional(),
