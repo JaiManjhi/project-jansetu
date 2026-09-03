@@ -25,6 +25,22 @@ export const EMBEDDING_DIMENSIONS = 768;
 export const GEMINI_BASE = "https://generativelanguage.googleapis.com/v1beta/models";
 
 /**
+ * Speech-to-text — ARCHITECTURE.md §3 always named this as the upgrade path
+ * from the browser's Web Speech API, and it became the primary path once the
+ * browser API proved unusable on the phones citizens actually report from.
+ *
+ * whisper-large-v3-turbo over whisper-large-v3: both are available on Groq and
+ * turbo is several times faster, which matters because the citizen is standing
+ * in front of the problem waiting for their words to appear. Passing an
+ * explicit `language` recovers most of the accuracy turbo gives up on Hindi,
+ * and the transcript is editable before submit, so a wrong word costs a tap
+ * rather than a bad report.
+ */
+export const GROQ_WHISPER_MODEL = "whisper-large-v3-turbo";
+export const GROQ_TRANSCRIBE_URL = "https://api.groq.com/openai/v1/audio/transcriptions";
+
+
+/**
  * AI_ENGINE.md §5 — prompt-injection guard.
  *
  * Prepended to raw citizen text in EVERY prompt that embeds it. This is a
@@ -38,6 +54,8 @@ export const INJECTION_GUARD =
 export const TIMEOUTS = {
   embedMs: 10_000,
   generateMs: 15_000,
+  /** A 60s clip over a weak mobile connection needs real headroom. */
+  transcribeMs: 30_000,
 } as const;
 
 export function requireEnv(name: "GEMINI_API_KEY" | "GROQ_API_KEY"): string {

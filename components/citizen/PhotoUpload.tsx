@@ -103,9 +103,18 @@ export function PhotoUpload({
         id="photos"
         type="file"
         accept="image/*"
-        // On a phone this offers the camera directly, which is the common case
-        // for someone standing in front of the problem.
-        capture="environment"
+        /*
+         * No `capture` attribute, deliberately.
+         *
+         * It was set to "environment" on the assumption that a citizen is
+         * standing in front of the problem. What it actually does on a phone is
+         * jump straight into the camera and REMOVE the option to pick an
+         * existing photo — so someone who photographed the broken hand pump
+         * this morning, or who is reporting on behalf of a neighbour, has no
+         * way to attach it. Omitting the attribute gives the OS picker, which
+         * offers the camera *and* the gallery, so the camera case still costs
+         * one extra tap and the gallery case stops being impossible.
+         */
         multiple
         className="sr-only"
         disabled={disabled || uploading}

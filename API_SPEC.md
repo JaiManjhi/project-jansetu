@@ -95,6 +95,46 @@ Rate-limited per IP, since an unauthenticated signing endpoint is otherwise an o
 
 ---
 
+## Voice
+
+### `POST /api/transcribe` — **public**, rate-limited
+Turns a recorded audio clip into text for the citizen report form. Accepts `multipart/form-data`.
+
+**Request fields:**
+
+| field | type | notes |
+|---|---|---|
+| `audio` | File | required; the recorded clip, max 8 MB |
+| `language` | string | optional; `en` or `hi`. Anything else is ignored rather than rejected |
+
+**Response `200`:**
+```json
+{ "text": "string" }
+```
+
+**Errors:** `VALIDATION_FAILED` (no file), `EMPTY_AUDIO`, `AUDIO_TOO_LARGE` (413),
+`UNSUPPORTED_AUDIO` (415), `TRANSCRIPTION_UNAVAILABLE` / `TRANSCRIPTION_FAILED` /
+`TRANSCRIPTION_RATE_LIMITED` (503), `RATE_LIMITED` (429).
+
+Transcribed with `whisper-large-v3-turbo` on Groq. The `language` field is passed
+upstream as a hint — it measurably improves Hindi accuracy and stops a Hindi clip
+being rendered as phonetic English.
+
+This route exists because the browser-native Web Speech API, which ARCHITECTURE.md
+§3 originally specified, does not work on the phones this app is for: Android
+Chrome mishandles continuous recognition and iOS needs Siri dictation enabled, and
+in both cases the citizen speaks and sees nothing appear. Recording locally and
+transcribing server-side behaves the same on every device.
+
+Rate-limited per IP at 40/hour. Like `POST /api/problems`, this is an
+unauthenticated route that spends provider quota on every call.
+
+The transcript is returned for the citizen to **edit before submitting**, never
+submitted directly — PRD §6 requires that, because recognition of Indian-accented
+speech is imperfect and a wrong word must cost a tap, not a bad report.
+
+---
+
 ## Institutions
 
 ### `GET /api/institutions` — **public**

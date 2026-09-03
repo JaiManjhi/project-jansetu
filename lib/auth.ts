@@ -122,6 +122,22 @@ export async function getSessionUserForChrome(): Promise<SessionUser | null> {
   try {
     return await getSessionUser();
   } catch (error: unknown) {
+    /**
+     * Next.js signals "this route cannot be static" by THROWING out of
+     * `headers()` during prerender, which getServerSession calls. That is
+     * control flow, not a failure, and swallowing it would both spam the build
+     * log with fake errors and risk a page being frozen as signed-out — a
+     * logged-in coordinator would then see "Sign in" forever. Re-thrown so
+     * Next handles it exactly as if this catch were not here.
+     */
+    if (
+      typeof error === "object" &&
+      error !== null &&
+      (error as { digest?: unknown }).digest === "DYNAMIC_SERVER_USAGE"
+    ) {
+      throw error;
+    }
+
     console.error(
       `[auth] session lookup failed while rendering chrome; degrading to signed-out: ${
         error instanceof Error ? error.message : error
