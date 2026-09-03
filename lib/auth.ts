@@ -99,6 +99,38 @@ export interface SessionUser {
 }
 
 /** Returns the signed-in user, or null. */
+/**
+ * A session read that degrades to "signed out" instead of throwing.
+ *
+ * For CHROME ONLY — the header, and anything else decorative that renders on
+ * every page. Never use it to guard a protected page or route.
+ *
+ * The reason it exists: SiteHeader renders in the root layout, so an exception
+ * from getServerSession propagates out of EVERY page in the app. That is
+ * exactly what happened on the first Vercel deploy — NEXTAUTH_SECRET was not
+ * set, NextAuth threw "There is a problem with the server configuration", and
+ * all six routes returned 500 including the public feed and the citizen report
+ * form. A misconfigured session must not be able to take down a page that does
+ * not need a session at all: a citizen reporting a problem is the one user who
+ * never signs in, and they are the last person who should see a white screen.
+ *
+ * The failure is logged rather than swallowed, so a broken auth config is still
+ * visible in the platform logs instead of silently showing everyone a
+ * signed-out header.
+ */
+export async function getSessionUserForChrome(): Promise<SessionUser | null> {
+  try {
+    return await getSessionUser();
+  } catch (error: unknown) {
+    console.error(
+      `[auth] session lookup failed while rendering chrome; degrading to signed-out: ${
+        error instanceof Error ? error.message : error
+      }`,
+    );
+    return null;
+  }
+}
+
 export async function getSessionUser(): Promise<SessionUser | null> {
   const session = await getServerSession(authOptions);
   if (!session?.user?.role) return null;

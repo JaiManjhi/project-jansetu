@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getSessionUser } from "@/lib/auth";
+import { getSessionUserForChrome } from "@/lib/auth";
 import { SignOutButton } from "@/components/ui/SignOutButton";
 
 /**
@@ -18,7 +18,8 @@ const DASHBOARD_FOR: Record<string, { href: string; label: string }> = {
 };
 
 export async function SiteHeader() {
-  const user = await getSessionUser();
+  // Chrome must never 500 a page over auth — see getSessionUserForChrome.
+  const user = await getSessionUserForChrome();
   const dashboard = user ? DASHBOARD_FOR[user.role] : undefined;
 
   return (
