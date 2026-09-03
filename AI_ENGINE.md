@@ -180,6 +180,31 @@ Ties in the sweep are broken toward the **higher** threshold, because the two er
 4. **Select the matched department.** The vector search above ranks *institutions*, so nothing about it identifies which department matched — that has to be computed. For each candidate, take the cosine similarity between the problem's embedding and each entry in `departments[].embedding`, and pick the highest-scoring department. This is plain arithmetic over ~5 stored vectors per candidate: no Atlas index, no API call, negligible latency. Store the winner's name on `matches.matchedDepartment`. For shallow institutions, `departments` is empty — set `matchedDepartment: null` and skip step 5.
 5. Apply a minor penalty for that department's `activeProjectCount`, to avoid overloading the same popular faculty: `finalScore -= min(0.02 * activeProjectCount, 0.1)`. The cap is what keeps this a tie-breaker rather than the dominant term — without it, a department with 40 active projects would be pushed below genuinely irrelevant institutions.
 6. Sort by `finalScore` descending, take top 3
+7. **Refuse below `finalScore` 0.20.** Vector search always returns its nearest fifty, so there is always a "best" candidate even when nothing fits; a floor is what turns "the closest thing I found" into "a match I am willing to state". A problem with no candidate above the floor keeps status `processing`, not `routed`.
+
+### Amendment (2026-09-04) — two ranking defects found by seeding a real caseload
+
+Both were found by seeding fifteen Jharkhand problems and reading the output, not by a unit test. Recorded here because the numbers are the justification for two constants in `lib/ai/match.ts`.
+
+**1. Boilerplate expertise was outranking real expertise.** The institution seeding pipeline writes an honest annotation when a source publishes no research profile — `"single-purpose pharmacy college"`, `"detailed faculty research pages not typically published for institutions of this scale"`, `"Polytechnic-level diploma programs …"`. It lands in `facultyExpertise`, which step 4 reads as evidence of capability.
+
+Measured: **126 of the 218 departments** carrying any expertise text carry one of those three strings — 87 pharmacy colleges sharing two, 39 polytechnics sharing a third. Identical generic prose embeds to nearly the same vector, and that vector is close to everything. Observed consequences before the fix:
+
+| Problem | Routed to | Distance |
+|---|---|---|
+| Broken hand pump, Ranchi | APAAR College of Pharmacy, Jashpur | 160 km, another state |
+| Health centre with no doctor, Hazaribagh | Kismat Pharmacy College, Balrampur | 195 km |
+| No wheelchair ramp, Deoghar | Bodhni Devi Pharmacy College, Jagdalpur | 779 km |
+
+A string repeated across dozens of unrelated institutions cannot discriminate between them, whatever its embedding says. Such departments are now demoted to the same standing as a bare department name: nameable, not score-raising.
+
+**2. Demoting departments was not enough**, because `capabilityEmbedding` is built from the same text — a college whose whole profile is filler fell back onto an equally contaminated institution vector and kept winning. On a water problem, pharmacy boilerplate scored cosine ≈ 0.59 while Birsa Agricultural University's actual water-harvesting group scored ≈ 0.35.
+
+So an institution with **no distinctive expertise anywhere** has its similarity multiplied by `NO_EVIDENCE_TRUST = 0.55`. A discount, not an exclusion: absence of a published research page is not absence of capability, and a nearby polytechnic often beats a distant research institute.
+
+**Result on the same fifteen problems:** pharmacy colleges ranked #1 for 5 problems before, **0 after**. Good matches score 0.29–0.49; the discarded ones scored 0.05–0.13, which is the empty band the 0.20 floor cuts through. Four of fifteen problems are now honestly **not routed** rather than confidently mismatched.
+
+⚠ **Known weak spots that remain**, stated plainly rather than hidden: solar street lights in Giridih route to NIT Durgapur's Biotechnology department, and a washed-out road routes to XLRI's sustainability centre. Both clear the floor on generic sustainability vocabulary. The underlying cause is unchanged and documented in §9 — dense retrieval alone barely discriminates between institutions for infrastructure problems, and the fix is hybrid retrieval blending a lexical signal from the classified category.
 7. For each of the top 3, generate a reason string (see below)
 8. Write to `matches` collection with `rank` 1-3, including `matchedDepartment`
 

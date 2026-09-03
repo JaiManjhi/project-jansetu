@@ -18,7 +18,8 @@
     "prebuild": "node scripts/sync-map-worker.mjs",
     "gen:icons": "node scripts/generate-icons.mjs",
     "seed:users": "node --env-file=.env.local scripts/seed-users.mts",
-    "seed:demo": "node --env-file=.env.local scripts/seed-demo-problems.mts"
+    "seed:demo": "node --env-file=.env.local scripts/seed-demo-problems.mts",
+    "seed:jharkhand": "node --env-file=.env.local scripts/seed-demo-jharkhand.mts"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",
