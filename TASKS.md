@@ -8,12 +8,12 @@ Consult `SETUP.md` before Day 1 — every account and key must exist first.
 
 ## Day 1 — Foundation
 
-- [ ] Init Next.js 14 App Router project, TypeScript strict mode, Tailwind configured with the tokens from `DESIGN.md §2-4`
-- [ ] Set up MongoDB Atlas M0 cluster, connect via `lib/db.ts` singleton pattern
-- [ ] Implement all Mongoose schemas exactly per `DATA_MODEL.md` — every field, every type
-- [ ] Set up the two Atlas Vector Search indexes (`problem_embedding_index`, `institution_capability_index`) — confirm embedding dimension against the actual model output first, don't guess it. `problem_embedding_index` must declare `district`, `status`, and `createdAt` as `filter` fields (exact index JSON is in `DATA_MODEL.md`); a missing filter field fails at query time, not at index creation, so it will look fine until Day 3's first dedup run
-- [ ] NextAuth config per `ARCHITECTURE.md §7` — four roles, credential-based
-- [ ] Deploy a "hello world" version to Vercel immediately — confirms the deploy pipeline works before any real feature is built on top of it
+- [x] Init Next.js 14 App Router project, TypeScript strict mode, Tailwind configured with the tokens from `DESIGN.md §2-4`
+- [x] Set up MongoDB Atlas M0 cluster, connect via `lib/db.ts` singleton pattern
+- [x] Implement all Mongoose schemas exactly per `DATA_MODEL.md` — every field, every type
+- [x] Set up the two Atlas Vector Search indexes (`problem_embedding_index`, `institution_capability_index`) — confirm embedding dimension against the actual model output first, don't guess it. `problem_embedding_index` must declare `district`, `status`, and `createdAt` as `filter` fields (exact index JSON is in `DATA_MODEL.md`); a missing filter field fails at query time, not at index creation, so it will look fine until Day 3's first dedup run
+- [x] NextAuth config per `ARCHITECTURE.md §7` — four roles, credential-based
+- [x] Deploy a "hello world" version to Vercel immediately — confirms the deploy pipeline works before any real feature is built on top of it
 
 ## Day 2 — Institution + district data
 
