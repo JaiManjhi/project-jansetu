@@ -16,10 +16,13 @@ Start as a citizen — no login needed, and it is the flow that matters most.
 
 **Citizen** (no login)
 1. Report a real problem near you — use the microphone, it transcribes in ~2s
+   (pick your language first: English, हिंदी, বাংলা or मराठी)
 2. Attach a photo from your camera **or** your gallery
 3. Check the result: category, severity, and three institutions with reasons
 4. Submit the *same problem in different words* — it should merge, not duplicate
-5. Open the Feed and add support to someone else's report
+5. Open the Feed, hit **Translate** on any report and read it in another
+   language — English, Hindi, Bengali, Marathi or Odia
+6. Add support to someone else's report
 
 **University** (NIT Jamshedpur coordinator)
 1. See problems routed to your departments, with match score and written reason
@@ -86,6 +89,9 @@ All verified against the live deployment, not just locally.
   offline and submits when the connection returns. Installable on a phone.
 - **Voice input** — records on the phone, transcribes server-side. The browser's
   own speech API was removed; it does not work reliably on Android or iOS.
+- **5 languages** — speak in English, Hindi, Bengali or Marathi; read any report
+  in those four plus Odia via a Translate button on every card. Translations are
+  cached, so the first reader waits ~1s and everyone after them is instant.
 - **AI engine** — classification, deduplication and routing, each measured
   against an evaluation set. Every routing result carries a written reason.
 - **Public feed** — browse by category, add support, follow your own submission.
@@ -112,6 +118,11 @@ Better admitted than discovered by a judge.
   data would immediately improve routing.
 - **Free-tier AI quotas.** Heavy repeated testing can hit a rate limit for a few
   minutes. Fine for a demo; a real deployment needs paid keys.
+- **Odia can be read but not spoken.** Whisper rejects Odia audio outright — we
+  tested it rather than assuming. It works fully as a reading language.
+- **Only English voice is verified with real speech.** Hindi, Bengali and Marathi
+  are accepted by the transcriber and documented as supported, but nobody has
+  recorded a test in them yet. *Please test this and tell me what happens.*
 - **Seeded data is Jharkhand only.** The heatmap shows one state. Institutions
   cover 11 states, so wider seeding is possible.
 - **No institution self-sign-up.** Deliberate. Real onboarding needs domain
