@@ -25,6 +25,8 @@ export interface ProblemDoc {
   title: string;
   description: string;
   language: string;
+  /** Cached on-demand translations, keyed by target language code. */
+  translations: Record<string, { title: string; description: string; translatedAt: Date }>;
   category: Category | null;
   severityScore: number | null;
   location: GeoPoint;
@@ -48,6 +50,19 @@ const ProblemSchema = new Schema<ProblemDoc>(
     title: { type: String, required: true, trim: true },
     description: { type: String, required: true, trim: true },
     language: { type: String, required: true, default: "en", trim: true },
+
+    /**
+     * DATA_MODEL.md — written only by POST /api/problems/:id/translate.
+     *
+     * Mixed type rather than a sub-schema: the keys are language codes, not
+     * fixed field names, and Mongoose sub-schemas cannot express a map whose
+     * keys are data. `default: {}` matters — without it an untranslated problem
+     * has `undefined` here and every read site needs a guard.
+     */
+    translations: {
+      type: Schema.Types.Mixed,
+      default: () => ({}),
+    },
 
     // null only while unclassified — always paired with needsReview: true.
     category: { type: String, enum: [...CATEGORY_ENUM, null], default: null },

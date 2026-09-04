@@ -95,6 +95,33 @@ Rate-limited per IP, since an unauthenticated signing endpoint is otherwise an o
 
 ---
 
+### `POST /api/problems/:id/translate` — **public**, rate-limited
+Returns a report in another language, translating on first request and caching the result.
+
+**Request:** `{ "targetLanguage": "hi" | "en" | "bn" | "mr" | "or" }`
+
+**Response `200`:**
+```json
+{
+  "targetLanguage": "bn",
+  "title": "string",
+  "description": "string",
+  "source": "original" | "cached" | "translated"
+}
+```
+
+`source` says where the text came from, which is worth exposing rather than hiding: `original` when the report was already written in that language and nothing was spent, `cached` when a previous reader already paid for it, `translated` when this request generated it.
+
+**Errors:** `INVALID_ID` (400), `VALIDATION_FAILED` (400), `NOT_FOUND` (404), `TRANSLATION_UNAVAILABLE` (503), `RATE_LIMITED` (429).
+
+Nothing is translated at submission time — that would multiply AI spend on every submission for readers who may never come. The rate limit is checked **after** the cache, so re-reading a translation someone else already paid for never counts against a reader's budget.
+
+The cache is written with a targeted `$set` on `translations.<code>` rather than by saving the whole document, so two readers requesting two different languages at the same moment cannot clobber each other.
+
+**Odia is translation-only.** Groq's Whisper endpoint rejects `language=or` with `unsupported language: or`, so Odia is a language JanSetu can be *read* in, not one it can be *spoken* to in. `lib/constants.ts` holds both enums and a test guards the asymmetry.
+
+---
+
 ## Voice
 
 ### `POST /api/transcribe` — **public**, rate-limited
@@ -105,7 +132,7 @@ Turns a recorded audio clip into text for the citizen report form. Accepts `mult
 | field | type | notes |
 |---|---|---|
 | `audio` | File | required; the recorded clip, max 8 MB |
-| `language` | string | optional; `en` or `hi`. Anything else is ignored rather than rejected |
+| `language` | string | optional; one of `en`, `hi`, `bn`, `mr`. Anything else is ignored rather than rejected |
 
 **Response `200`:**
 ```json

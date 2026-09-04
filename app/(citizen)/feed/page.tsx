@@ -2,6 +2,7 @@ import Link from "next/link";
 import { connectToDatabase } from "@/lib/db";
 import { Problem } from "@/models/Problem";
 import { UpvoteButton } from "@/components/citizen/UpvoteButton";
+import { TranslateControl } from "@/components/citizen/TranslateControl";
 import { CATEGORY_ENUM } from "@/lib/constants";
 
 /**
@@ -39,7 +40,7 @@ function timeAgo(date: Date): string {
 async function loadProblems(filter: Record<string, unknown>) {
   await connectToDatabase();
   return Problem.find(filter)
-    .select("-embedding")
+    .select("-embedding -translations") // cached translations are fetched on demand, not shipped with the list
     .sort({ upvoteCount: -1, createdAt: -1 })
     .limit(50)
     .lean();
@@ -163,6 +164,12 @@ export default async function FeedPage({
               <div className="min-w-0">
                 <p className="text-base text-ink-900">{p.title}</p>
                 <p className="mt-1 line-clamp-2 text-sm text-ink-600">{p.description}</p>
+                <TranslateControl
+                  problemId={p._id.toString()}
+                  sourceLanguage={p.language}
+                  title={p.title}
+                  description={p.description}
+                />
                 <p className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-ink-300">
                   <span>
                     {p.district}, {p.state}

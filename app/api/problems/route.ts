@@ -285,7 +285,7 @@ export async function GET(request: Request) {
 
   const [items, total] = await Promise.all([
     Problem.find(filter)
-      .select("-embedding") // never ship 768 floats to a list view
+      .select("-embedding -translations") // never ship 768 floats, or every cached translation, to a list view
       .sort({ createdAt: -1 })
       .skip((q.page - 1) * q.limit)
       .limit(q.limit)

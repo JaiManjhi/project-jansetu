@@ -3,7 +3,12 @@ import assert from "node:assert/strict";
 import { embedText, cosineSimilarity, EmbeddingUnavailableError } from "../lib/ai/embed.ts";
 import { classifyProblem, ClassificationUnavailableError } from "../lib/ai/classify.ts";
 import { EMBEDDING_DIMENSIONS } from "../lib/ai/models.ts";
-import { CATEGORY_ENUM } from "../lib/constants.ts";
+import {
+  CATEGORY_ENUM,
+  LANGUAGE_NAMES,
+  TRANSLATION_LANGUAGE_ENUM,
+  VOICE_LANGUAGE_ENUM,
+} from "../lib/constants.ts";
 
 const LIVE = Boolean(process.env.GEMINI_API_KEY && process.env.GROQ_API_KEY);
 const live = { skip: LIVE ? false : "no API keys in env" };
@@ -90,4 +95,41 @@ test("classifyProblem: resists prompt injection in the description", live, async
 
 test("classifyProblem: rejects empty description", async () => {
   await assert.rejects(() => classifyProblem("  "), ClassificationUnavailableError);
+});
+
+/**
+ * The language split is empirical, and empirical facts rot silently.
+ *
+ * Odia is absent from VOICE_LANGUAGE_ENUM because the Groq Whisper endpoint
+ * rejects `language=or` with `unsupported language: or` — verified against the
+ * live API on 2026-09-04. It is present in TRANSLATION_LANGUAGE_ENUM because the
+ * LLM translates into Odia correctly. Nothing in the type system encodes that
+ * asymmetry, so someone tidying the two lists into one would break voice input
+ * for every Odia speaker and only find out from a user.
+ */
+test("Odia is a reading language, never a speaking one", () => {
+  assert.ok(
+    TRANSLATION_LANGUAGE_ENUM.includes("or"),
+    "Odia must remain available for translation",
+  );
+  assert.ok(
+    !(VOICE_LANGUAGE_ENUM as readonly string[]).includes("or"),
+    "Odia must NOT be offered for voice input — Whisper returns 400 for language=or",
+  );
+});
+
+test("every voice language can also be read", () => {
+  for (const code of VOICE_LANGUAGE_ENUM) {
+    assert.ok(
+      (TRANSLATION_LANGUAGE_ENUM as readonly string[]).includes(code),
+      `${code} is offered for speech but cannot be translated into`,
+    );
+  }
+});
+
+test("every offered language has a display name", () => {
+  for (const code of TRANSLATION_LANGUAGE_ENUM) {
+    const name = LANGUAGE_NAMES[code];
+    assert.ok(name?.native && name.english, `${code} is missing a display name`);
+  }
 });

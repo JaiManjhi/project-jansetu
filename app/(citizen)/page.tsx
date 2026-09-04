@@ -203,6 +203,8 @@ export default function ReportProblemPage() {
               {[
                 { code: "en", label: "English" },
                 { code: "hi", label: "हिंदी" },
+                { code: "bn", label: "বাংলা" },
+                { code: "mr", label: "मराठी" },
               ].map((option) => (
                 <button
                   key={option.code}

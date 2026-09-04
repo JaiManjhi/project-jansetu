@@ -30,12 +30,33 @@ Database: MongoDB Atlas (free M0 tier). Collections below, each with fields, typ
 
 ## `problems`
 
+> **Language fields (amended 2026-09-04).** `language` is the language the report
+> was *written or spoken in*; `translations` caches renderings of it into other
+> languages. The two enums are deliberately different sizes, and the difference is
+> empirical, not arbitrary: **Whisper cannot transcribe Odia** — the Groq API
+> rejects `language=or` outright with `unsupported language: or` — while the LLM
+> translates into Odia correctly. So Odia is a language you can *read* JanSetu in,
+> not one you can *speak to* it in. See `lib/constants.ts`, where the two enums are
+> defined and this split is enforced.
+>
+> `translations` is written only by `POST /api/problems/:id/translate` and only on
+> demand. Nothing is translated at submission time, because translating every
+> report into every language would multiply the AI spend on every submission for
+> readers who may never come.
+
 ```ts
 {
   _id: ObjectId,
   title: string,                          // short, either citizen-provided or LLM-summarized from description
   description: string,                    // full text, from typed input or voice transcription
-  language: string,                       // language the citizen submitted in — "hi" | "en" | the one verified regional code (PRD.md §7). Defaults to "en" if the client omits it
+  language: string,                       // language the citizen submitted in — one of VOICE_LANGUAGE_ENUM (PRD.md §7). Defaults to "en" if the client omits it
+  translations: {                         // on-demand translations, cached so the second reader costs nothing. Empty until someone asks
+    [languageCode: string]: {             // key is one of TRANSLATION_LANGUAGE_ENUM
+      title: string,
+      description: string,
+      translatedAt: Date
+    }
+  },
   category: string | null,                // one of CATEGORY_ENUM (see AI_ENGINE.md §1). null only while unclassified — i.e. a submission saved during total AI outage, which always carries needsReview: true
   severityScore: number | null,           // 0-100, from AI severity signal. null under the same condition as category
   location: {

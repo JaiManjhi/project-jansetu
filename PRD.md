@@ -81,6 +81,13 @@ Given a single solo developer building with AI coding assistants, scope is delib
 
 Ship Hindi + English + one regional language chosen by whichever the developer can actually verify works (test with real speech, don't assume). State in the pitch that the architecture supports adding more via Bhashini without a redesign — do not claim broad language coverage that hasn't been tested.
 
+**As built (2026-09-04).** Speaking: English, Hindi, Bengali, Marathi. Reading: those four plus Odia, via an on-demand translate control on every report in the feed.
+
+Two honest caveats, in the spirit of the paragraph above:
+
+- **Odia cannot be spoken to JanSetu**, only read. Groq's Whisper endpoint rejects `language=or` outright. Every other code here was confirmed accepted by the live API before being offered.
+- **"Accepted by the transcriber" is not "verified with real speech."** Only English has been tested end to end with an actual recording. Bengali and Marathi are offered because Whisper accepts them and is documented as supporting them — say exactly that in the pitch, not more.
+
 ## 8. Geographic scope
 
 **All-India institute coverage, tiered:**

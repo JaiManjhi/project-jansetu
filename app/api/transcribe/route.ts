@@ -6,6 +6,7 @@ import {
   requireEnv,
 } from "@/lib/ai/models";
 import { rateLimit, clientIp } from "@/lib/rate-limit";
+import { VOICE_LANGUAGE_ENUM } from "@/lib/constants";
 
 /**
  * POST /api/transcribe — public. API_SPEC.md.
@@ -52,8 +53,13 @@ const ALLOWED_AUDIO_PREFIXES = [
   "audio/flac",
 ];
 
-/** Only the two languages the report form offers. */
-const ALLOWED_LANGUAGES = new Set(["en", "hi"]);
+/**
+ * The languages the report form offers, and the only ones passed upstream as a
+ * hint. Every code was verified against the live Whisper endpoint — Odia is
+ * absent because Groq rejects `language=or` outright, which is also why it is a
+ * reading language only. See lib/constants.ts.
+ */
+const ALLOWED_LANGUAGES = new Set<string>(VOICE_LANGUAGE_ENUM);
 
 /**
  * Transcription costs Groq quota per call on an unauthenticated route, exactly

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { LOCATION_SOURCE_ENUM } from "./constants.ts";
+import { LOCATION_SOURCE_ENUM , VOICE_LANGUAGE_ENUM} from "./constants.ts";
 
 /**
  * Zod schemas, shared client + server. API_SPEC.md requires server-side
@@ -26,7 +26,12 @@ export const CreateProblemSchema = z
     locationSource: z.enum(LOCATION_SOURCE_ENUM),
     locationAccuracyM: z.number().min(0).max(100_000).optional(),
     mediaUrls: z.array(z.string().url()).max(5).default([]),
-    language: z.string().trim().min(2).max(12).default("en"),
+    /**
+     * Constrained to the languages we can actually transcribe. It was a loose
+     * 2-12 character string, which let a client store any code it liked in a
+     * field the transcriber and the translator both read.
+     */
+    language: z.enum(VOICE_LANGUAGE_ENUM).default("en"),
   })
   .refine(
     (v) => v.locationSource === "gps" || v.locationAccuracyM === undefined,
