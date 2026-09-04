@@ -193,7 +193,31 @@ export function VoiceInput({ language, onTranscript }: VoiceInputProps) {
 
     let stream: MediaStream;
     try {
-      stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      /**
+       * Capture shaped for speech recognition rather than for music.
+       *
+       * Groq downsamples everything to 16 kHz mono before transcribing, so
+       * recording at 48 kHz stereo uploads several times the bytes to reach the
+       * same result — and this app is used on rural connections where that is
+       * the difference between a report sending and a report failing. Asking
+       * for 16 kHz mono up front makes the clip small and skips a resample.
+       *
+       * The three processing flags matter more than they look for the actual
+       * recording conditions here: someone standing beside a road, holding a
+       * cheap phone at arm's length. Gain control rescues a quiet speaker,
+       * noise suppression takes out traffic. All four are hints — a browser is
+       * free to ignore any of them, which is why nothing downstream assumes a
+       * particular rate.
+       */
+      stream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+          channelCount: 1,
+          sampleRate: 16_000,
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true,
+        },
+      });
     } catch (error: unknown) {
       setError(permissionMessage(error));
       return;
@@ -203,7 +227,16 @@ export function VoiceInput({ language, onTranscript }: VoiceInputProps) {
     let recorder: MediaRecorder;
     try {
       const mimeType = pickMimeType();
-      recorder = new MediaRecorder(stream, mimeType ? { mimeType } : undefined);
+      recorder = new MediaRecorder(stream, {
+        ...(mimeType ? { mimeType } : {}),
+        /**
+         * Opus at 48 kbps is generous for 16 kHz mono speech — well above the
+         * point where compression starts eating consonants, which is exactly
+         * what a transcriber mishears. A full 60-second clip is still only
+         * about 360 KB.
+         */
+        audioBitsPerSecond: 48_000,
+      });
     } catch {
       cleanup();
       setError("This browser cannot record audio. Please type instead.");

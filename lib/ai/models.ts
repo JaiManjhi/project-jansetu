@@ -36,7 +36,30 @@ export const GEMINI_BASE = "https://generativelanguage.googleapis.com/v1beta/mod
  * and the transcript is editable before submit, so a wrong word costs a tap
  * rather than a bad report.
  */
-export const GROQ_WHISPER_MODEL = "whisper-large-v3-turbo";
+export const GROQ_WHISPER_MODEL = "whisper-large-v3";
+
+/**
+ * Vocabulary hints passed to Whisper as its `prompt`, one per language.
+ *
+ * Whisper's prompt biases spelling, script and vocabulary by giving the decoder
+ * text that looks like what it is about to hear. Civic reports are full of
+ * domain words — hand pump, drain, block office — that a general model in a
+ * low-resource language is most likely to get wrong, and these are exactly the
+ * words the classifier downstream depends on.
+ *
+ * English is deliberately absent: it needs no help, and an unnecessary prompt is
+ * a way to bias a transcription that was already going to be right.
+ *
+ * ⚠ These sentences were machine-generated and are correctly scripted, but no
+ * native speaker has reviewed them. A sentence written by an actual Bengali or
+ * Marathi speaker describing a civic problem would be strictly better, and
+ * replacing one is a one-line change with no other code impact.
+ */
+export const WHISPER_LANGUAGE_HINTS: Record<string, string> = {
+  hi: "गांव के सरकारी कार्यालय से हाथ पंप, पीने का पानी, सड़क, बिजली, स्कूल, अस्पताल, नाली की समस्या तुरंत ठीक करवाएँ।",
+  bn: "গ্রামের হ্যান্ড পাম্পে পানীয় জল নেই, রাস্তা পিচ্ছিল, বিদ্যুৎ বারবার চলে যায়; স্কুল, হাসপাতাল ও ড্রেনের অবস্থা খারাপ, সরকারী অফিসে অভিযোগ দিই।",
+  mr: "गावातील हातपंप, पिण्याचे पाणी, रस्ता, वीज, शाळा, रुग्णालय, नाली सर्व बिघडले; सरकार कार्यालयाकडे तक्रार करावी.",
+};
 export const GROQ_TRANSCRIBE_URL = "https://api.groq.com/openai/v1/audio/transcriptions";
 
 

@@ -3,6 +3,7 @@ import {
   GROQ_TRANSCRIBE_URL,
   GROQ_WHISPER_MODEL,
   TIMEOUTS,
+  WHISPER_LANGUAGE_HINTS,
   requireEnv,
 } from "@/lib/ai/models";
 import { rateLimit, clientIp } from "@/lib/rate-limit";
@@ -119,6 +120,22 @@ export async function POST(request: Request) {
   // Telling Whisper the language is worth more accuracy than it looks, and it
   // stops a Hindi clip being "transcribed" as phonetic English.
   if (language) upstream.set("language", language);
+
+  /**
+   * Greedy decoding. Groq documents 0 as the recommended default, and for a
+   * transcription that a citizen will read back and correct, a reproducible
+   * answer is worth more than a fluent-sounding one.
+   */
+  upstream.set("temperature", "0");
+
+  /**
+   * A vocabulary hint in the target language. Whisper biases toward text that
+   * resembles its prompt, which is what pulls domain words — hand pump, drain,
+   * block office — back from the nearest common word in a low-resource
+   * language. Only set for languages that have one; English does not.
+   */
+  const hint = language ? WHISPER_LANGUAGE_HINTS[language] : undefined;
+  if (hint) upstream.set("prompt", hint);
 
   let response: Response;
   try {

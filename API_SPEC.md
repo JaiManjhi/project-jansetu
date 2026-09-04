@@ -143,7 +143,19 @@ Turns a recorded audio clip into text for the citizen report form. Accepts `mult
 `UNSUPPORTED_AUDIO` (415), `TRANSCRIPTION_UNAVAILABLE` / `TRANSCRIPTION_FAILED` /
 `TRANSCRIPTION_RATE_LIMITED` (503), `RATE_LIMITED` (429).
 
-Transcribed with `whisper-large-v3-turbo` on Groq. The `language` field is passed
+Transcribed with `whisper-large-v3` on Groq at `temperature: 0`, with a
+short vocabulary hint in the target language passed as Whisper's `prompt`.
+
+**Model choice (revised 2026-09-05).** This was `whisper-large-v3-turbo`, chosen
+for latency. A user reported Bengali and Marathi transcription as badly
+inaccurate, and Groq's own figures explain it: turbo is **12% WER** against
+large-v3's **10.3%**, and Groq's guidance is explicit — *"if your application is
+error-sensitive and requires multilingual support, use whisper-large-v3."* A
+citizen reporting a civic problem in Bengali is precisely that case. Measured
+cost of the switch on a 25-second clip: **~60ms** (770-884ms → 834-900ms), for a
+17% relative error reduction.
+
+The `language` field is passed
 upstream as a hint — it measurably improves Hindi accuracy and stops a Hindi clip
 being rendered as phonetic English.
 
