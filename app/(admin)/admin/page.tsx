@@ -1,10 +1,11 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getSessionUser } from "@/lib/auth";
 import { connectToDatabase } from "@/lib/db";
 import { Problem } from "@/models/Problem";
 import { Institution } from "@/models/Institution";
 import { Project } from "@/models/Project";
-import { CATEGORY_ENUM } from "@/lib/constants";
+import { CATEGORY_ENUM, VISIBLE_PROBLEM_FILTER } from "@/lib/constants";
 import { Heatmap, type HeatPoint } from "@/components/admin/Heatmap";
 
 /**
@@ -35,12 +36,18 @@ const CATEGORY_LABELS: Record<string, string> = {
   rural_livelihoods: "Livelihoods",
 };
 
-const NOT_MERGED = { status: { $ne: "duplicate_merged" as const } };
+/**
+ * Removed reports are excluded from every figure on this dashboard as well as
+ * from the heatmap. A report taken down for abuse is not a civic problem that
+ * was reported, and counting it would overstate demand in that district.
+ * The removed COUNT is surfaced separately below, so moderation stays visible.
+ */
+const NOT_MERGED = { ...{ status: { $ne: "duplicate_merged" as const } }, ...VISIBLE_PROBLEM_FILTER };
 
 async function loadDashboard() {
   await connectToDatabase();
 
-  const [total, byCategoryRaw, byStateRaw, needsReview, mergedCount, points, institutions, projects] =
+  const [total, byCategoryRaw, byStateRaw, needsReview, mergedCount, removedCount, points, institutions, projects] =
     await Promise.all([
       Problem.countDocuments(NOT_MERGED),
       Problem.aggregate<{ _id: string | null; count: number }>([
@@ -52,8 +59,9 @@ async function loadDashboard() {
         { $group: { _id: "$state", count: { $sum: 1 } } },
         { $sort: { count: -1 } },
       ]),
-      Problem.countDocuments({ needsReview: true }),
-      Problem.countDocuments({ status: "duplicate_merged" }),
+      Problem.countDocuments({ needsReview: true, ...VISIBLE_PROBLEM_FILTER }),
+      Problem.countDocuments({ status: "duplicate_merged", ...VISIBLE_PROBLEM_FILTER }),
+      Problem.countDocuments({ removedAt: { $ne: null } }),
       Problem.find(NOT_MERGED).select("location locationSource upvoteCount district state").limit(5000).lean(),
       Institution.countDocuments(),
       Project.aggregate<{ _id: string; count: number }>([
@@ -61,7 +69,7 @@ async function loadDashboard() {
       ]),
     ]);
 
-  return { total, byCategoryRaw, byStateRaw, needsReview, mergedCount, points, institutions, projects };
+  return { total, byCategoryRaw, byStateRaw, needsReview, mergedCount, removedCount, points, institutions, projects };
 }
 
 export default async function AdminDashboard() {
@@ -138,6 +146,24 @@ export default async function AdminDashboard() {
           hint={data.needsReview > 0 ? "Classification failed" : undefined}
         />
       </section>
+
+      {/* Only shown once something has been removed — a permanent zero would be
+          a tile earning its place on the dashboard by doing nothing. */}
+      {data.removedCount > 0 && (
+        <section className="mt-4">
+          <p className="border-l-2 border-warning bg-surface px-4 py-3 text-sm text-ink-600">
+            <span className="font-medium text-warning">
+              {data.removedCount} report{data.removedCount === 1 ? "" : "s"} removed
+            </span>{" "}
+            from the public feed. Removed reports are excluded from every figure above. They are
+            listed in place on the{" "}
+            <Link href="/feed" className="text-accent underline underline-offset-2">
+              feed
+            </Link>{" "}
+            where you can review the reason or restore them.
+          </p>
+        </section>
+      )}
 
       <section className="mt-10">
         <h2 className="font-display text-xl text-ink-900">Where problems are being reported</h2>

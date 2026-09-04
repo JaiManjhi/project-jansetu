@@ -3,6 +3,7 @@ import { connectToDatabase } from "@/lib/db";
 import { Problem } from "@/models/Problem";
 import { Institution } from "@/models/Institution";
 import { Project } from "@/models/Project";
+import { VISIBLE_PROBLEM_FILTER } from "@/lib/constants";
 import { requireRole, AuthError } from "@/lib/auth";
 import { CATEGORY_ENUM } from "@/lib/constants";
 
@@ -25,9 +26,9 @@ export async function GET() {
   // admin uses to judge volume — the opposite of what dedup is for.
   // `as const` so the literal narrows to the status enum — a widened string
   // is rejected by the typed filter, which is the schema doing its job.
-  const notMerged = { status: { $ne: "duplicate_merged" as const } };
+  const notMerged = { status: { $ne: "duplicate_merged" as const }, ...VISIBLE_PROBLEM_FILTER };
 
-  const [totalProblems, byCategoryRaw, byStateRaw, needsReview, projectsClaimed, projectsCompleted, institutionsActive] =
+  const [totalProblems, byCategoryRaw, byStateRaw, needsReview, removedCount, projectsClaimed, projectsCompleted, institutionsActive] =
     await Promise.all([
       Problem.countDocuments(notMerged),
       Problem.aggregate<{ _id: string | null; count: number }>([
@@ -39,7 +40,8 @@ export async function GET() {
         { $group: { _id: "$state", count: { $sum: 1 } } },
         { $sort: { count: -1 } },
       ]),
-      Problem.countDocuments({ needsReview: true }),
+      Problem.countDocuments({ needsReview: true, ...VISIBLE_PROBLEM_FILTER }),
+      Problem.countDocuments({ removedAt: { $ne: null } }),
       Project.countDocuments({ status: { $in: ["claimed", "in_progress"] } }),
       Project.countDocuments({ status: "completed" }),
       Project.distinct("institutionId").then((ids) => ids.length),
@@ -73,5 +75,8 @@ export async function GET() {
     // is useless without a count to drive it.
     needsReview,
     unclassified,
+    // Moderation has to be visible to be accountable: an admin should be able
+    // to see how much has been taken down without going looking for it.
+    removedCount,
   });
 }

@@ -78,6 +78,8 @@ interface RawHit {
   title?: unknown;
   description?: unknown;
   upvoteCount?: unknown;
+  /** null or absent when visible; a Date once an admin has removed it. */
+  removedAt?: unknown;
   score?: unknown;
 }
 
@@ -128,14 +130,26 @@ export async function findDuplicate(
         title: 1,
         description: 1,
         upvoteCount: 1,
+        removedAt: 1,
         score: { $meta: "vectorSearchScore" },
       },
     },
   ])) as RawHit[];
 
-  // Belt and braces: never merge a problem into itself, whatever the filter did.
+  /**
+   * Removed reports are excluded HERE rather than in the $vectorSearch filter
+   * above, deliberately. Every path in that filter must be declared as a
+   * `filter` field on the Atlas index, and `removedAt` is not — adding it there
+   * would make Atlas reject every dedup query at runtime, which is exactly the
+   * trap the comment on that block warns about. Filtering in memory costs
+   * nothing at this size and needs no index change.
+   *
+   * It matters because a removed report must not absorb later submissions: if
+   * an abusive post were left as a dedup candidate, a genuine report of the
+   * same problem would be merged into it and silently disappear.
+   */
   const candidates: DedupCandidate[] = hits
-    .filter((h) => !h._id.equals(selfId) && typeof h.score === "number")
+    .filter((h) => !h._id.equals(selfId) && typeof h.score === "number" && !h.removedAt)
     .map((h) => ({
       problemId: h._id.toString(),
       title: typeof h.title === "string" ? h.title : "",
@@ -152,6 +166,7 @@ export async function findDuplicate(
     district,
     createdAt: { $gte: new Date(Date.now() - RECENCY_WINDOW_MS) },
     status: { $ne: "duplicate_merged" },
+    removedAt: null,
     _id: { $ne: selfId },
     embedding: { $exists: true },
   })

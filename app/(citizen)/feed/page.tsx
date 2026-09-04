@@ -3,7 +3,9 @@ import { connectToDatabase } from "@/lib/db";
 import { Problem } from "@/models/Problem";
 import { UpvoteButton } from "@/components/citizen/UpvoteButton";
 import { TranslateControl } from "@/components/citizen/TranslateControl";
-import { CATEGORY_ENUM } from "@/lib/constants";
+import { ModerationControl } from "@/components/admin/ModerationControl";
+import { getSessionUserForChrome } from "@/lib/auth";
+import { CATEGORY_ENUM, VISIBLE_PROBLEM_FILTER } from "@/lib/constants";
 
 /**
  * Public problem feed. A server component reading the database directly —
@@ -59,7 +61,24 @@ export default async function FeedPage({
   // Merged reports are deliberately excluded: they are supporting evidence for
   // another problem, not separate problems, and listing both would make the
   // deduplication look like it had not worked.
-  const filter: Record<string, unknown> = { status: { $ne: "duplicate_merged" } };
+  /**
+   * Admins see removed reports; nobody else does.
+   *
+   * Restoring a report has to be possible from somewhere, and the feed is where
+   * an admin is already looking. Removed reports stay in their place in the
+   * list, marked, with a Restore control — rather than in a separate screen
+   * that has to be remembered.
+   *
+   * The session read cannot throw the page: the feed is public and must render
+   * for someone who is not signed in at all.
+   */
+  const viewer = await getSessionUserForChrome();
+  const isAdmin = viewer?.role === "admin";
+
+  const filter: Record<string, unknown> = {
+    status: { $ne: "duplicate_merged" },
+    ...(isAdmin ? {} : VISIBLE_PROBLEM_FILTER),
+  };
   if (activeCategory) filter.category = activeCategory;
 
   /**
@@ -170,6 +189,13 @@ export default async function FeedPage({
                   title={p.title}
                   description={p.description}
                 />
+                {isAdmin && (
+                  <ModerationControl
+                    problemId={p._id.toString()}
+                    removed={p.removedAt !== null}
+                    removedReason={p.removedReason}
+                  />
+                )}
                 <p className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-ink-300">
                   <span>
                     {p.district}, {p.state}

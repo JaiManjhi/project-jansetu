@@ -116,3 +116,41 @@ export function isTranslationLanguage(value: string): value is TranslationLangua
 export function isVoiceLanguage(value: string): value is VoiceLanguage {
   return (VOICE_LANGUAGE_ENUM as readonly string[]).includes(value);
 }
+
+/**
+ * Why a report was taken down. Recorded on every removal, never free text
+ * alone — a fixed list is what makes "how much of this is spam vs abuse?" a
+ * question an admin can actually answer later.
+ */
+export const REMOVAL_REASON_ENUM = [
+  "abusive",
+  "spam",
+  "personal_information",
+  "not_a_civic_problem",
+  "other",
+] as const;
+export type RemovalReason = (typeof REMOVAL_REASON_ENUM)[number];
+
+export const REMOVAL_REASON_LABELS: Record<RemovalReason, string> = {
+  abusive: "Abusive or offensive",
+  spam: "Spam",
+  personal_information: "Contains personal information",
+  not_a_civic_problem: "Not a civic problem",
+  other: "Other",
+};
+
+/**
+ * The single definition of "the public may see this report".
+ *
+ * Spread into every public read rather than written inline, because there are
+ * ten such paths and the failure mode of the inline version is silent: miss one
+ * and removed content stays reachable through it. The two that are easiest to
+ * forget are translation and upvote — a removed report that can still be
+ * translated is still readable, just in a different language.
+ *
+ * `removedAt: null` matches documents written before this field existed as well
+ * as visible ones, because MongoDB treats a missing field and an explicit null
+ * identically here. That is what makes this safe to add to a live collection
+ * without a migration.
+ */
+export const VISIBLE_PROBLEM_FILTER = { removedAt: null } as const;

@@ -95,6 +95,30 @@ Rate-limited per IP, since an unauthenticated signing endpoint is otherwise an o
 
 ---
 
+### `PATCH /api/problems/:id/moderation` — **auth: admin**
+Takes a report down, or restores it.
+
+**Request:** `{ "removed": true, "reason": "abusive" | "spam" | "personal_information" | "not_a_civic_problem" | "other" }`
+or `{ "removed": false }` to restore.
+
+**Response `200`:** `{ "problemId", "removed", "removedReason", "status" }`
+
+**Errors:** `INVALID_ID` (400), `VALIDATION_FAILED` (400), `UNAUTHENTICATED` (401), `FORBIDDEN` (403), `NOT_FOUND` (404).
+
+Submission is open to anyone without an account — the accessibility decision the product rests on — which also means nothing stops someone posting abuse. This is the counterweight, and it was missing until 2026-09-05.
+
+**Soft delete, always.** The document is never destroyed, `removedAt` / `removedReason` / `removedBy` record who did it and why, and restoring is the same endpoint with `removed: false`. A deletion nobody can account for is its own problem in a government portal.
+
+**Removal is not a status.** Status is a workflow stage, and a removed report may already be `claimed` with a live project against it; overwriting that would destroy the record of where the work had reached. The two are independent, so a report can be removed from any stage and restored to the one it was in.
+
+**Admin only, never university** — a coordinator able to remove reports from their own queue could hide work rather than moderate content.
+
+Removed reports disappear from: the public feed, `GET /api/problems`, `GET /api/problems/:id` (404), every institution queue, the admin figures and heatmap, dedup candidates, **and both `translate` and `upvote`**. Those last two are the easiest to miss and the most damaging — a removed report that can still be translated is still fully readable, just in another language. Every one of those paths composes `VISIBLE_PROBLEM_FILTER` from `lib/constants.ts` rather than repeating the condition.
+
+⚠ **Known limit:** an attached photo stays reachable at its Cloudinary URL for anyone who already has it. Hiding the report does not unpublish the image. Deleting from Cloudinary would be a hard delete that destroys the evidence of what was removed, so it is deliberately not done.
+
+---
+
 ### `POST /api/problems/:id/translate` — **public**, rate-limited
 Returns a report in another language, translating on first request and caching the result.
 

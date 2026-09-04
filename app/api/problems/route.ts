@@ -10,6 +10,7 @@ import { matchProblem, type MatchResult } from "@/lib/ai/match";
 import { Match } from "@/models/Match";
 import { getSessionUser } from "@/lib/auth";
 import { rateLimit, clientIp } from "@/lib/rate-limit";
+import { VISIBLE_PROBLEM_FILTER } from "@/lib/constants";
 
 /**
  * POST /api/problems — public. API_SPEC.md.
@@ -276,7 +277,9 @@ export async function GET(request: Request) {
     return errorResponse("Could not reach the database.", "DB_UNAVAILABLE", 503);
   }
 
-  const filter: Record<string, unknown> = {};
+  // Removed reports are invisible to the public list. VISIBLE_PROBLEM_FILTER
+  // is the single definition of that — see lib/constants.ts.
+  const filter: Record<string, unknown> = { ...VISIBLE_PROBLEM_FILTER };
   if (q.category) filter.category = q.category;
   if (q.state) filter.state = q.state;
   if (q.district) filter.district = q.district;

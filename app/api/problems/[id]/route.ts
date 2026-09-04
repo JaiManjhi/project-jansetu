@@ -4,7 +4,7 @@ import { connectToDatabase } from "@/lib/db";
 import { Problem } from "@/models/Problem";
 import { Project } from "@/models/Project";
 import { requireRole, AuthError } from "@/lib/auth";
-import { PROBLEM_STATUS_ENUM } from "@/lib/constants";
+import { PROBLEM_STATUS_ENUM, VISIBLE_PROBLEM_FILTER } from "@/lib/constants";
 import { z } from "zod";
 
 /** GET /api/problems/:id — public. PATCH — auth: university or admin. */
@@ -23,14 +23,20 @@ export async function GET(
   }
 
   await connectToDatabase();
-  const problem = await Problem.findById(id).select("-embedding").lean();
+  const problem = await Problem.findOne({ _id: id, ...VISIBLE_PROBLEM_FILTER })
+    .select("-embedding")
+    .lean();
+  // A removed report is a 404 rather than a tombstone: returning "this was
+  // removed for abuse" alongside the text would republish what was taken down.
   if (!problem) return errorResponse("Problem not found.", "NOT_FOUND", 404);
 
   // If this report was merged into another, return the one it was merged into
   // as well — a citizen following their own submission needs to land on the
   // live problem, not a dead end (PRD §6: "know what happened to it").
   const mergedInto = problem.duplicateOf
-    ? await Problem.findById(problem.duplicateOf).select("-embedding").lean()
+    ? await Problem.findOne({ _id: problem.duplicateOf, ...VISIBLE_PROBLEM_FILTER })
+        .select("-embedding")
+        .lean()
     : null;
 
   return NextResponse.json({ problem, mergedInto });

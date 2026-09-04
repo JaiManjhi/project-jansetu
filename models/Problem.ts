@@ -40,6 +40,10 @@ export interface ProblemDoc {
   needsReview: boolean;
   duplicateOf: Types.ObjectId | null;
   upvoteCount: number;
+  /** Soft-delete moderation — see DATA_MODEL.md. null removedAt means visible. */
+  removedAt: Date | null;
+  removedReason: string | null;
+  removedBy: Types.ObjectId | null;
   embedding?: number[];
   createdAt: Date;
   updatedAt: Date;
@@ -121,6 +125,18 @@ const ProblemSchema = new Schema<ProblemDoc>(
     needsReview: { type: Boolean, required: true, default: false },
     duplicateOf: { type: Schema.Types.ObjectId, ref: "Problem", default: null },
     upvoteCount: { type: Number, required: true, default: 0, min: 0 },
+
+    /**
+     * Moderation — DATA_MODEL.md. Soft delete: the document is never destroyed,
+     * so a wrong call is reversible and a removal stays accountable.
+     *
+     * `default: null` rather than leaving these undefined, so the filter
+     * `{ removedAt: null }` reads identically for a document written before
+     * these fields existed and one written after.
+     */
+    removedAt: { type: Date, default: null, index: true },
+    removedReason: { type: String, default: null },
+    removedBy: { type: Schema.Types.ObjectId, ref: "User", default: null },
 
     // Absent (not empty) until generated — an unembedded problem must be
     // invisible to dedup rather than a zero-vector that matches everything.

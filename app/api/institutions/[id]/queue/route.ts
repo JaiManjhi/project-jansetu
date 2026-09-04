@@ -4,6 +4,7 @@ import { connectToDatabase } from "@/lib/db";
 import { Match } from "@/models/Match";
 import { Problem } from "@/models/Problem";
 import { requireRole, AuthError } from "@/lib/auth";
+import { VISIBLE_PROBLEM_FILTER } from "@/lib/constants";
 
 /**
  * GET /api/institutions/:id/queue — auth: university (own institution) or
@@ -53,7 +54,10 @@ export async function GET(
   // Only unclaimed problems belong in a queue. PRD §6 asks that claimed ones
   // stay visible elsewhere as "claimed" rather than vanishing, but they are
   // not work this institution can pick up.
+  // Removed reports leave every institution queue too — moderation should not
+  // stop at the public feed while coordinators still see the content.
   const problems = await Problem.find({
+    ...VISIBLE_PROBLEM_FILTER,
     _id: { $in: matches.map((m) => m.problemId) },
     status: { $in: ["routed", "processing"] },
   })

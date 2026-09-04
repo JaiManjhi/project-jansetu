@@ -4,7 +4,7 @@ import { z } from "zod";
 import { connectToDatabase } from "@/lib/db";
 import { Problem } from "@/models/Problem";
 import { translateProblem, TranslationUnavailableError } from "@/lib/ai/translate";
-import { TRANSLATION_LANGUAGE_ENUM } from "@/lib/constants";
+import { TRANSLATION_LANGUAGE_ENUM, VISIBLE_PROBLEM_FILTER } from "@/lib/constants";
 import { rateLimit, clientIp } from "@/lib/rate-limit";
 
 /**
@@ -66,7 +66,12 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     return errorResponse("Could not reach the database.", "DB_UNAVAILABLE", 503);
   }
 
-  const problem = await Problem.findById(id)
+  /**
+   * Removed reports are not translatable. This is the least obvious of the ten
+   * visibility checks and the most important: without it, content taken down
+   * for abuse is still fully readable — just in a different language.
+   */
+  const problem = await Problem.findOne({ _id: id, ...VISIBLE_PROBLEM_FILTER })
     .select("title description language translations")
     .lean();
   if (!problem) return errorResponse("Problem not found.", "NOT_FOUND", 404);

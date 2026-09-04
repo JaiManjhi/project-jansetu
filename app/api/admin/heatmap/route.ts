@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { connectToDatabase } from "@/lib/db";
 import { Problem } from "@/models/Problem";
+import { VISIBLE_PROBLEM_FILTER } from "@/lib/constants";
 import { requireRole, AuthError } from "@/lib/auth";
 import { CATEGORY_ENUM } from "@/lib/constants";
 
@@ -57,7 +58,10 @@ export async function GET(request: Request) {
 
   await connectToDatabase();
 
-  const filter: Record<string, unknown> = { status: { $ne: "duplicate_merged" as const } };
+  const filter: Record<string, unknown> = {
+    status: { $ne: "duplicate_merged" as const },
+    ...VISIBLE_PROBLEM_FILTER,
+  };
   if (q.category) filter.category = q.category;
   if (q.dateFrom || q.dateTo) {
     const range: Record<string, Date> = {};

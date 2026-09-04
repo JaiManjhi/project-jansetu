@@ -5,6 +5,10 @@ import { classifyProblem, ClassificationUnavailableError } from "../lib/ai/class
 import { EMBEDDING_DIMENSIONS } from "../lib/ai/models.ts";
 import {
   CATEGORY_ENUM,
+  PROBLEM_STATUS_ENUM,
+  REMOVAL_REASON_ENUM,
+  REMOVAL_REASON_LABELS,
+  VISIBLE_PROBLEM_FILTER,
   LANGUAGE_NAMES,
   TRANSLATION_LANGUAGE_ENUM,
   VOICE_LANGUAGE_ENUM,
@@ -132,4 +136,34 @@ test("every offered language has a display name", () => {
     const name = LANGUAGE_NAMES[code];
     assert.ok(name?.native && name.english, `${code} is missing a display name`);
   }
+});
+
+/**
+ * Visibility is defined once and composed everywhere, because there are ten
+ * public read paths and the failure mode of an inline `removedAt: null` is
+ * silent — miss one and removed content is still reachable through it. These
+ * assert the shape of that definition rather than the database behaviour, which
+ * is covered by the live checks against the deployment.
+ */
+test("visible-problem filter matches documents written before the field existed", () => {
+  // MongoDB treats a missing field and an explicit null identically for this
+  // query, which is what makes the field safe to add without a migration.
+  assert.deepEqual(VISIBLE_PROBLEM_FILTER, { removedAt: null });
+});
+
+test("every removal reason has a label an admin can read", () => {
+  for (const reason of REMOVAL_REASON_ENUM) {
+    const label = REMOVAL_REASON_LABELS[reason];
+    assert.ok(label && label.length > 0, `${reason} has no label`);
+    assert.notEqual(label, reason, `${reason} label is just the raw enum value`);
+  }
+});
+
+test("removal is not a problem status", () => {
+  // Moderation and workflow are independent: a removed report may already be
+  // claimed, and overwriting its stage would destroy that record.
+  assert.ok(
+    !(PROBLEM_STATUS_ENUM as readonly string[]).includes("removed"),
+    "removal must not be modelled as a status — see DATA_MODEL.md",
+  );
 });

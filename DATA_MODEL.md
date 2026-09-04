@@ -39,6 +39,24 @@ Database: MongoDB Atlas (free M0 tier). Collections below, each with fields, typ
 > not one you can *speak to* it in. See `lib/constants.ts`, where the two enums are
 > defined and this split is enforced.
 >
+> **Moderation (added 2026-09-05).** Anyone can report a problem without an
+> account — the accessibility decision the whole product rests on — which also
+> means anyone can post abuse. `removedAt` / `removedReason` / `removedBy` are a
+> **soft delete with an audit trail**: the report stops being publicly visible,
+> the document survives, and who removed it and why is recorded.
+>
+> Moderation is deliberately NOT a `status` value. Status is a workflow stage,
+> and a removed report may already be `claimed` with a live project attached;
+> overwriting that would destroy the record of where the work had got to. The two
+> are independent, so a report can be removed from any stage and restored to the
+> one it was in.
+>
+> Every public read path composes `VISIBLE_PROBLEM_FILTER` from `lib/constants.ts`
+> rather than writing `removedAt: null` inline. There are ten such paths, and the
+> easy failure is missing one — translation and upvote in particular, where a
+> forgotten filter lets anyone still read or boost removed content by asking for
+> it in another language.
+
 > `translations` is written only by `POST /api/problems/:id/translate` and only on
 > demand. Nothing is translated at submission time, because translating every
 > report into every language would multiply the AI spend on every submission for
@@ -72,7 +90,10 @@ Database: MongoDB Atlas (free M0 tier). Collections below, each with fields, typ
   status: "processing" | "routed" | "claimed" | "in_progress" | "resolved" | "duplicate_merged",
   needsReview: boolean,                   // default false. Set true when classification failed twice or both AI providers were unreachable (AI_ENGINE.md §1, §7). Drives the admin manual-classification queue
   duplicateOf: ObjectId | null,           // set if this was merged into an existing problem
-  upvoteCount: number,                    // default 0
+  upvoteCount: number,
+  removedAt: Date | null,                 // set when an admin takes the report down; null means visible. Soft delete — the document is never destroyed
+  removedReason: string | null,           // one of REMOVAL_REASON_ENUM. Required whenever removedAt is set
+  removedBy: ObjectId | null,             // users._id of the admin who removed it                    // default 0
   embedding?: number[],                   // vector, from lib/ai/embed.ts — dimension per model, document it in AI_ENGINE.md. Absent (not empty) if embedding failed; Atlas simply does not index a doc missing the path, which is the behaviour we want — an unembedded problem should be invisible to dedup, not a zero-vector that matches everything
   createdAt: Date,
   updatedAt: Date

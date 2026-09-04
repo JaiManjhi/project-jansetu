@@ -3,6 +3,7 @@ import { isValidObjectId } from "mongoose";
 import { connectToDatabase } from "@/lib/db";
 import { Problem } from "@/models/Problem";
 import { rateLimit, clientIp } from "@/lib/rate-limit";
+import { VISIBLE_PROBLEM_FILTER } from "@/lib/constants";
 
 /**
  * POST /api/problems/:id/upvote — public, rate-limited per API_SPEC.md.
@@ -35,7 +36,11 @@ export async function POST(
 
   // A merged report is not its own thing any more — its supporters belong on
   // the problem it was merged into, or the count silently splits in two.
-  const target = await Problem.findById(id).select("_id duplicateOf status").lean();
+  // Removed reports cannot be supported. Without this filter a removed report
+  // stays reachable by anyone who kept its id.
+  const target = await Problem.findOne({ _id: id, ...VISIBLE_PROBLEM_FILTER })
+    .select("_id duplicateOf status")
+    .lean();
   if (!target) {
     return NextResponse.json({ error: "Problem not found.", code: "NOT_FOUND" }, { status: 404 });
   }
