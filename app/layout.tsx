@@ -1,21 +1,73 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Fraunces } from "next/font/google";
+import {
+  Noto_Sans,
+  Noto_Serif,
+  Noto_Sans_Devanagari,
+  Noto_Sans_Bengali,
+  Noto_Sans_Oriya,
+} from "next/font/google";
 import "./globals.css";
 import { SiteHeader } from "@/components/ui/SiteHeader";
+import { SiteFooter } from "@/components/ui/SiteFooter";
 
-// DESIGN.md §3 — Inter for UI/body, one distinct display face for section
-// headers only. Fraunces is the doc's own suggestion; used at 20px and above.
-const inter = Inter({
-  variable: "--font-inter",
+/**
+ * DESIGN.md §3 — Noto, not Inter.
+ *
+ * Inter has no Devanagari, Bengali or Odia glyphs, and this app translates
+ * reports into all three. Every translated report was rendering in whatever
+ * fallback the reader's OS supplied. Noto covers all of them and is also what
+ * the Government of India's Digital Brand Identity Manual requires.
+ */
+const notoSans = Noto_Sans({
+  variable: "--font-noto-sans",
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
   display: "swap",
 });
 
-const fraunces = Fraunces({
-  variable: "--font-fraunces",
+const notoSerif = Noto_Serif({
+  variable: "--font-noto-serif",
   subsets: ["latin"],
+  weight: ["400", "600", "700"],
   display: "swap",
 });
+
+/**
+ * The Indic faces are NOT preloaded. They are needed only once a reader asks
+ * for a translation, and JanSetu is used on rural connections where preloading
+ * four families ahead of a first paint would be indefensible.
+ */
+const notoDevanagari = Noto_Sans_Devanagari({
+  variable: "--font-noto-devanagari",
+  subsets: ["devanagari"],
+  weight: ["400", "500", "600", "700"],
+  display: "swap",
+  preload: false,
+});
+
+const notoBengali = Noto_Sans_Bengali({
+  variable: "--font-noto-bengali",
+  subsets: ["bengali"],
+  weight: ["400", "500", "600"],
+  display: "swap",
+  preload: false,
+});
+
+const notoOriya = Noto_Sans_Oriya({
+  variable: "--font-noto-oriya",
+  subsets: ["oriya"],
+  weight: ["400", "500", "600"],
+  display: "swap",
+  preload: false,
+});
+
+const fontVariables = [
+  notoSans.variable,
+  notoSerif.variable,
+  notoDevanagari.variable,
+  notoBengali.variable,
+  notoOriya.variable,
+].join(" ");
 
 export const metadata: Metadata = {
   title: "JanSetu",
@@ -30,7 +82,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#fafaf8",
+  themeColor: "#1f3f77",
   width: "device-width",
   initialScale: 1,
 };
@@ -46,11 +98,12 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${fraunces.variable} h-full antialiased`}
+      className={`${fontVariables} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col">
         <SiteHeader />
         {children}
+        <SiteFooter />
       </body>
     </html>
   );

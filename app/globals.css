@@ -15,15 +15,27 @@
   --color-paper: #fafaf8;
   --color-surface: #ffffff;
   --color-border: #e4e4e0;
-  --color-accent: #c1571f;
-  --color-accent-subtle: #fdf1e7;
-  --color-success: #1e7a4c;
+  /* §2 — logo navy. 9.87:1 on --paper, measured. */
+  --color-accent: #1f3f77;
+  --color-accent-subtle: #edf2fa;
+  --color-accent-deep: #162d55;
+  /* Text-safe green (4.91:1). The logo's brighter green fails AA and is used
+     only inside the logo mark itself. */
+  --color-success: #2e7d32;
+  /* White-on-solid only (4.59:1) — badges, never body text. */
+  --color-severity: #b85c0a;
   --color-warning: #b8860b;
   --color-danger: #b3261e;
 
   /* §3 Typography — Inter for UI/body, Fraunces for display headings only */
-  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
-  --font-display: var(--font-fraunces), ui-serif, Georgia, serif;
+  /* §3 — Noto covers every script JanSetu translates into. The Indic families
+     are listed after the Latin one so a translated report sets correctly
+     instead of falling back to whatever the reader's OS supplies. */
+  --font-sans:
+    var(--font-noto-sans), var(--font-noto-devanagari), var(--font-noto-bengali),
+    var(--font-noto-oriya), ui-sans-serif, system-ui, sans-serif;
+  --font-display:
+    var(--font-noto-serif), var(--font-noto-devanagari), ui-serif, Georgia, serif;
 
   /* §3 Scale — 12/14/16/20/24/32/48. No sizes outside this scale. */
   --text-xs: 0.75rem; /* 12 */
@@ -54,9 +66,20 @@
 /*
   §9 — inputs are 44px minimum touch target. Citizens are on phones,
   often outdoors, often one-handed.
+
+  This was `@theme { --size-touch: 2.75rem }`, which reads correctly but
+  generated NOTHING. Tailwind's `--size-*` namespace produces `size-*`, `w-*`
+  and `h-*` utilities — not `min-h-*`. So every `min-h-touch` in the codebase
+  (25 of them, across 13 files) silently resolved to `min-height: auto`, and the
+  buttons a citizen taps while standing in a field measured 24-26px instead of
+  the 44px this rule exists to guarantee. It looked right in the markup and in
+  the design doc, and was wrong in the browser.
+
+  Declared as a real utility instead, so the class name used throughout now
+  emits the property it claims to.
 */
-@theme {
-  --size-touch: 2.75rem; /* 44px */
+@utility min-h-touch {
+  min-height: 2.75rem;
 }
 
 html {

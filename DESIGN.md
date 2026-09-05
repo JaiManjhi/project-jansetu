@@ -18,23 +18,58 @@ Avoid a literal tricolor cliché (no saffron-white-green banding). Instead, a re
 | `--paper` | `#FAFAF8` | Base background — warm off-white, not stark white |
 | `--surface` | `#FFFFFF` | Card/panel background |
 | `--border` | `#E4E4E0` | Hairline borders |
-| `--accent` | `#C1571F` | Primary accent — a muted, terracotta-leaning saffron. Used sparingly: primary CTA, active states, key data points. Never as a full-panel background |
-| `--accent-subtle` | `#FDF1E7` | Accent tint, for selected/hover backgrounds |
+| `--accent` | `#1F3F77` | Primary accent — the logo's navy. Primary CTA, active states, links, key data points. 9.87:1 on `--paper`. Never as a full-panel background |
+| `--accent-subtle` | `#EDF2FA` | Accent tint, for selected/hover backgrounds |
+| `--success` | `#2E7D32` | Resolved/claimed states. Text-safe green (4.91:1) — NOT the logo's brighter green, which fails AA |
+| `--severity` | `#B85C0A` | High-severity badges, white text on solid only (4.59:1). Never body text |
 | `--success` | `#1E7A4C` | Confirmations, matched status |
 | `--warning` | `#B8860B` | Pending, needs-review states |
 | `--danger` | `#B3261E` | Errors, high-severity flags |
 
-> **⚠ Open conflict — logo vs UI palette (recorded 2026-09-02).**
+> **✅ Conflict resolved — 2026-09-05.** The palette now derives from the logo, and
+> the decision was made on measured contrast rather than taste.
 >
-> The team adopted a logo built on navy `#1F3F77`, green `#3D9B35` and orange. The product UI is built on `--accent #C1571F` (terracotta), per the table above.
+> `--accent` is the logo's navy `#1F3F77`, which scores **9.87:1** on the page
+> background — comfortably past WCAG AA, and higher than the terracotta it
+> replaces (4.32:1, which failed AA for body text and had been a latent
+> accessibility defect, not merely a mismatch).
 >
-> **The app icons now use the logo's colours; the UI still uses terracotta.** That mismatch is deliberate and recorded, not an oversight. Resolving it means either accepting it — the logo appears in the header only — or migrating the tokens above to navy/green, which also means re-checking text contrast for AA and retuning the admin heatmap ramp, since that ramp is built around the terracotta. Decide before demo day and update this section either way, so the doc stops contradicting the product.
+> The logo's own green and orange **cannot be used for text**: measured 3.38:1
+> and 2.63:1 respectively. They appear in the logo mark only. Their text-safe
+> equivalents are `--success #2E7D32` (4.91:1) and `--severity #B85C0A`
+> (4.59:1 as white-on-solid, so badges only, never body text).
 >
-> Separately: §1 bans "stock illustration of generic diverse people", and the logo's circle-of-figures motif sits in that family. The logo is the team's decision; this note exists so the rule and the artwork are not silently at odds.
+> This matters beyond taste: **GIGW 3.0**, the mandatory standard for Indian
+> government websites, requires conformity with WCAG 2.1 Level AA. A civic
+> portal that fails contrast is not merely ugly, it is non-compliant.
+>
+> The §1 note on the logo's circle-of-figures motif stands: the banned pattern is
+> stock illustration used as page decoration, which the app does not do. The logo
+> is a mark, and appears as one.
 
 Dark mode: invert to an ink-950 background (`#0E0F13`), not pure black. Ship dark mode only if Day 9-10 has slack — it is not required for the demo to succeed.
 
 ## 3. Typography
+
+> **Typeface changed to Noto — 2026-09-05.** Inter has no Devanagari, Bengali or
+> Odia glyphs. The app ships translation into all four scripts, so every
+> translated report was rendering in whatever fallback the reader's OS happened
+> to supply — different on Android, iOS and Windows, and occasionally tofu boxes.
+> That is a correctness bug in a multilingual product, not a styling preference.
+>
+> **Noto Sans** for UI and body, with `Noto Sans Devanagari`, `Noto Sans Bengali`
+> and `Noto Sans Oriya` in the stack for the scripts JanSetu supports.
+> **Noto Serif** for display headings, replacing Fraunces — it shares the Noto
+> metrics and covers the same scripts, so a Hindi heading sets like an English
+> one.
+>
+> This also happens to be what the Government of India's **Digital Brand Identity
+> Manual** requires: "Government entities must use Noto Sans scripts." Compliance
+> and correctness point the same way here.
+>
+> The Indic faces load with `preload: false` — they are only needed once a reader
+> asks for a translation, and this app is used on rural connections where
+> preloading four font families would be indefensible.
 
 - **UI/body:** Inter or Geist — clean, neutral, excellent at small sizes for dashboards
 - **Headings/display:** a distinct serif or grotesque for section headers only (e.g., a title like "Report a Problem") to avoid the generic all-sans-everything look every AI-generated site has. Something like Fraunces or Newsreader at large sizes works well against the sans body — pick one, use consistently
