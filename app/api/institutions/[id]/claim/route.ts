@@ -7,6 +7,7 @@ import { Project } from "@/models/Project";
 import { Match } from "@/models/Match";
 import { Institution } from "@/models/Institution";
 import { requireRole, AuthError } from "@/lib/auth";
+import { VISIBLE_PROBLEM_FILTER } from "@/lib/constants";
 
 /**
  * POST /api/institutions/:id/claim — auth: university. API_SPEC.md.
@@ -64,7 +65,9 @@ export async function POST(
 
   await connectToDatabase();
 
-  const problem = await Problem.findById(problemId).select("_id status").lean();
+  const problem = await Problem.findOne({ _id: problemId, ...VISIBLE_PROBLEM_FILTER })
+    .select("_id status")
+    .lean();
   if (!problem) return errorResponse("Problem not found.", "NOT_FOUND", 404);
   if (problem.status === "duplicate_merged") {
     return errorResponse(

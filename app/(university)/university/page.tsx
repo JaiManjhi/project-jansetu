@@ -7,6 +7,7 @@ import { Project } from "@/models/Project";
 import { Institution } from "@/models/Institution";
 import { QueueList, type QueueEntry } from "@/components/university/QueueList";
 import { ProjectCard } from "@/components/university/ProjectCard";
+import { VISIBLE_PROBLEM_FILTER } from "@/lib/constants";
 
 /**
  * University coordinator dashboard — PRD §5 "functional but simple".
@@ -47,7 +48,11 @@ export default async function UniversityDashboard() {
   // Only unclaimed problems belong in the queue.
   const problemIds = matches.map((m) => m.problemId);
   const problems = problemIds.length
-    ? await Problem.find({ _id: { $in: problemIds }, status: { $in: ["routed", "processing"] } })
+    ? await Problem.find({
+        _id: { $in: problemIds },
+        status: { $in: ["routed", "processing"] },
+        ...VISIBLE_PROBLEM_FILTER,
+      })
         .select("-embedding")
         .lean()
     : [];
@@ -79,7 +84,7 @@ export default async function UniversityDashboard() {
     .filter((e): e is QueueEntry => e !== null);
 
   const claimedProblems = projects.length
-    ? await Problem.find({ _id: { $in: projects.map((p) => p.problemId) } })
+    ? await Problem.find({ _id: { $in: projects.map((p) => p.problemId) }, ...VISIBLE_PROBLEM_FILTER })
         .select("title")
         .lean()
     : [];

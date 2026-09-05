@@ -6,7 +6,7 @@ import { Project } from "@/models/Project";
 import { Problem } from "@/models/Problem";
 import { Institution } from "@/models/Institution";
 import { requireRole, AuthError } from "@/lib/auth";
-import { PROJECT_STATUS_ENUM } from "@/lib/constants";
+import { PROJECT_STATUS_ENUM, VISIBLE_PROBLEM_FILTER } from "@/lib/constants";
 
 /** PATCH /api/projects/:id — auth: university, own project only. API_SPEC.md. */
 
@@ -32,7 +32,9 @@ export async function GET(
   if (!project) return errorResponse("Project not found.", "NOT_FOUND", 404);
 
   const [problem, institution] = await Promise.all([
-    Problem.findById(project.problemId).select("-embedding").lean(),
+    Problem.findOne({ _id: project.problemId, ...VISIBLE_PROBLEM_FILTER })
+      .select("-embedding")
+      .lean(),
     Institution.findById(project.institutionId).select("name district state").lean(),
   ]);
 

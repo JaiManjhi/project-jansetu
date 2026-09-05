@@ -6,6 +6,7 @@ import { Problem } from "@/models/Problem";
 import { Institution } from "@/models/Institution";
 import { Pledge } from "@/models/Pledge";
 import { PledgeForm } from "@/components/industry/PledgeForm";
+import { VISIBLE_PROBLEM_FILTER } from "@/lib/constants";
 
 /**
  * Industry partner dashboard — PRD §5 "functional but simple".
@@ -39,7 +40,9 @@ export default async function IndustryDashboard() {
 
   const [problems, institutions, pledges] = await Promise.all([
     projects.length
-      ? Problem.find({ _id: { $in: projects.map((p) => p.problemId) } }).select("-embedding").lean()
+      ? Problem.find({ _id: { $in: projects.map((p) => p.problemId) }, ...VISIBLE_PROBLEM_FILTER })
+          .select("-embedding")
+          .lean()
       : [],
     projects.length
       ? Institution.find({ _id: { $in: projects.map((p) => p.institutionId) } })

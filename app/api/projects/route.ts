@@ -4,6 +4,7 @@ import { Project } from "@/models/Project";
 import { Problem } from "@/models/Problem";
 import { Institution } from "@/models/Institution";
 import { getSessionUser } from "@/lib/auth";
+import { VISIBLE_PROBLEM_FILTER } from "@/lib/constants";
 
 /**
  * GET /api/projects — API_SPEC.md.
@@ -32,7 +33,9 @@ export async function GET(request: Request) {
   // Two lookups rather than N — a project list is useless without the problem
   // it is solving and the institution solving it.
   const [problems, institutions] = await Promise.all([
-    Problem.find({ _id: { $in: projects.map((p) => p.problemId) } }).select("-embedding").lean(),
+    Problem.find({ _id: { $in: projects.map((p) => p.problemId) }, ...VISIBLE_PROBLEM_FILTER })
+      .select("-embedding")
+      .lean(),
     Institution.find({ _id: { $in: projects.map((p) => p.institutionId) } })
       .select("name district state")
       .lean(),
