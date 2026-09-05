@@ -243,7 +243,9 @@ export default async function AdminDashboard() {
             </p>
           </div>
         ) : (
-          <dl className="mt-4 grid grid-cols-2 gap-4 lg:grid-cols-4">
+          // Three tiles in a three-column grid, not four. At lg:grid-cols-4 the
+          // last cell was always empty, so the row stretched over dead space.
+          <dl className="mt-4 grid grid-cols-2 gap-4 lg:grid-cols-3">
             <Stat label="Institutions loaded" value={data.institutions} />
             <Stat label="Projects claimed" value={claimed} />
             <Stat label="Projects completed" value={projectsByStatus.get("completed") ?? 0} />
