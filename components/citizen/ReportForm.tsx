@@ -198,7 +198,10 @@ export function ReportForm() {
             <p className="mt-1 text-sm text-ink-600">
               Used for voice input, and recorded with your report.
             </p>
-            <div className="mt-3 flex gap-3">
+            {/* flex-wrap: this row held two languages and now holds four. On a 339px
+              screen the fourth pushed the page into horizontal scroll — the one
+              layout failure a citizen on a cheap phone will actually notice. */}
+            <div className="mt-3 flex flex-wrap gap-3">
               {[
                 { code: "en", label: "English" },
                 { code: "hi", label: "हिंदी" },
