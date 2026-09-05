@@ -32,14 +32,20 @@ export async function SiteHeader() {
       <div className="border-b border-border bg-accent">
         <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-4 px-4 py-1.5 sm:px-6">
           <p className="text-xs text-white/90">
-            A Government of Jharkhand initiative · Smart India Hackathon SIH26043
+            A Government of Jharkhand initiative
+            <span className="hidden sm:inline"> · Smart India Hackathon SIH26043</span>
           </p>
           <p className="hidden text-xs text-white/70 sm:block">भारत सरकार · Government of India</p>
         </div>
       </div>
 
-      <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
-        <Link href="/" className="flex items-center gap-2.5">
+      {/* flex-wrap, not just justify-between. A signed-in coordinator has four
+          nav items, and on a narrow screen the nav collided with the wordmark —
+          "JanSetu" and "Report" overlapped into one another. Wrapping to a
+          second line is the honest fix; shrinking the mark would cost the
+          brand on exactly the devices most citizens use. */}
+      <div className="mx-auto flex w-full max-w-6xl flex-wrap items-center justify-between gap-x-6 gap-y-2 px-4 py-3 sm:px-6">
+        <Link href="/" className="flex shrink-0 items-center gap-2.5">
           <Image src="/icon-192.png" alt="" width={32} height={32} className="rounded-md" />
           <span className="font-display text-lg leading-none">
             <span className="text-accent">Jan</span>
@@ -47,7 +53,7 @@ export async function SiteHeader() {
           </span>
         </Link>
 
-        <nav className="flex items-center gap-5 text-sm">
+        <nav className="flex flex-wrap items-center gap-x-5 gap-y-1 text-sm">
           <Link href="/" className="text-ink-600 transition-colors hover:text-accent">
             Report
           </Link>

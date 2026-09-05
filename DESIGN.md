@@ -43,7 +43,14 @@ Avoid a literal tricolor cliché (no saffron-white-green banding). Instead, a re
 > government websites, requires conformity with WCAG 2.1 Level AA. A civic
 > portal that fails contrast is not merely ugly, it is non-compliant.
 >
-> The §1 note on the logo's circle-of-figures motif stands: the banned pattern is
+> **The admin heat ramp deliberately stays warm.** Migrating the accent to navy
+> raised the question of retuning it. It should not be retuned: the ramp encodes
+> report density, not brand, and warm-for-many is a convention a reader already
+> knows before they arrive. A navy-on-navy heatmap would be on-brand and harder
+> to read, which is the wrong trade for a map an administrator uses to decide
+> where to send attention.
+>
+> > The §1 note on the logo's circle-of-figures motif stands: the banned pattern is
 > stock illustration used as page decoration, which the app does not do. The logo
 > is a mark, and appears as one.
 
