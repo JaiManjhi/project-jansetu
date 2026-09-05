@@ -103,7 +103,7 @@ export function QueueList({
                 type="button"
                 onClick={() => void claim(problem._id)}
                 disabled={claiming !== null}
-                className="inline-flex min-h-touch shrink-0 items-center gap-2 rounded-button bg-accent px-5 text-base font-medium text-white transition-colors hover:bg-[#a84a1a] disabled:bg-ink-300"
+                className="inline-flex min-h-touch shrink-0 items-center gap-2 rounded-button bg-accent px-5 text-base font-medium text-white transition-colors hover:bg-accent-deep disabled:bg-ink-300"
               >
                 {claiming === problem._id && (
                   <LoaderCircle size={20} strokeWidth={1.5} className="animate-spin" aria-hidden />

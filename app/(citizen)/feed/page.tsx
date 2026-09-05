@@ -110,16 +110,23 @@ export default async function FeedPage({
         </p>
         <Link
           href="/"
-          className="mt-4 inline-flex min-h-touch items-center rounded-button bg-accent px-5 text-base font-medium text-white transition-colors hover:bg-[#a84a1a]"
+          className="mt-4 inline-flex min-h-touch items-center rounded-button bg-accent px-5 text-base font-medium text-white transition-colors hover:bg-accent-deep"
         >
           Report a problem
         </Link>
       </header>
 
-      <nav aria-label="Filter by category" className="mt-8 flex flex-wrap gap-2">
+      {/* One scrollable row rather than a wrapping block. With eleven categories
+          the wrapped version took two full rows and pushed the first report
+          below the fold on a phone — the filters were louder than the content
+          they filter. */}
+      <nav
+        aria-label="Filter by category"
+        className="-mx-4 mt-8 flex gap-2 overflow-x-auto px-4 pb-1 sm:mx-0 sm:px-0"
+      >
         <Link
           href="/feed"
-          className={`rounded-button border px-3 py-2 text-sm transition-colors ${
+          className={`shrink-0 rounded-button border px-3 py-2 text-sm transition-colors ${
             activeCategory === null
               ? "border-accent bg-accent-subtle text-accent"
               : "border-border bg-surface text-ink-600 hover:bg-accent-subtle"
@@ -131,7 +138,7 @@ export default async function FeedPage({
           <Link
             key={c}
             href={`/feed?category=${c}`}
-            className={`rounded-button border px-3 py-2 text-sm transition-colors ${
+            className={`shrink-0 rounded-button border px-3 py-2 text-sm transition-colors ${
               activeCategory === c
                 ? "border-accent bg-accent-subtle text-accent"
                 : "border-border bg-surface text-ink-600 hover:bg-accent-subtle"
@@ -208,12 +215,9 @@ export default async function FeedPage({
                   <span aria-hidden>·</span>
                   <span>{timeAgo(p.createdAt)}</span>
                   {p.category && (
-                    <>
-                      <span aria-hidden>·</span>
-                      <span className="text-ink-600">
-                        {CATEGORY_LABELS[p.category] ?? p.category}
-                      </span>
-                    </>
+                    <span className="rounded-button bg-accent-subtle px-2 py-0.5 text-xs font-medium text-accent">
+                      {CATEGORY_LABELS[p.category] ?? p.category}
+                    </span>
                   )}
                   {p.needsReview && (
                     <>

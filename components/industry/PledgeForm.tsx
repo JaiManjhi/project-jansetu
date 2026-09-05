@@ -81,7 +81,7 @@ export function PledgeForm({ projectId }: { projectId: string }) {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="mt-4 inline-flex min-h-touch items-center rounded-button bg-accent px-5 text-base font-medium text-white transition-colors hover:bg-[#a84a1a]"
+        className="mt-4 inline-flex min-h-touch items-center rounded-button bg-accent px-5 text-base font-medium text-white transition-colors hover:bg-accent-deep"
       >
         Offer support
       </button>
@@ -153,7 +153,7 @@ export function PledgeForm({ projectId }: { projectId: string }) {
         <button
           type="submit"
           disabled={submitting}
-          className="inline-flex min-h-touch items-center gap-2 rounded-button bg-accent px-5 text-base font-medium text-white transition-colors hover:bg-[#a84a1a] disabled:bg-ink-300"
+          className="inline-flex min-h-touch items-center gap-2 rounded-button bg-accent px-5 text-base font-medium text-white transition-colors hover:bg-accent-deep disabled:bg-ink-300"
         >
           {submitting && <LoaderCircle size={20} strokeWidth={1.5} className="animate-spin" aria-hidden />}
           {submitting ? "Recording…" : "Record pledge"}

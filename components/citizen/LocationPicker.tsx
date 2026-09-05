@@ -100,7 +100,7 @@ export function LocationPicker({ value, onChange }: LocationPickerProps) {
       attributionControl: { compact: true },
     });
 
-    const marker = new Marker({ color: "#C1571F", draggable: true })
+    const marker = new Marker({ color: "#1F3F77", draggable: true }) // --accent; MapLibre cannot read CSS vars
       .setLngLat([FALLBACK_CENTER.lng, FALLBACK_CENTER.lat])
       .addTo(map);
 

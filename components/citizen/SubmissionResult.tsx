@@ -143,7 +143,7 @@ function Actions({ onReset }: { onReset: () => void }) {
       <button
         type="button"
         onClick={onReset}
-        className="inline-flex min-h-touch items-center rounded-button bg-accent px-5 text-base font-medium text-white transition-colors hover:bg-[#a84a1a]"
+        className="inline-flex min-h-touch items-center rounded-button bg-accent px-5 text-base font-medium text-white transition-colors hover:bg-accent-deep"
       >
         Report another problem
       </button>
