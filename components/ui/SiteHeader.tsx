@@ -46,7 +46,7 @@ export async function SiteHeader() {
           brand on exactly the devices most citizens use. */}
       <div className="mx-auto flex w-full max-w-6xl flex-wrap items-center justify-between gap-x-6 gap-y-2 px-4 py-3 sm:px-6">
         <Link href="/" className="flex shrink-0 items-center gap-2.5">
-          <Image src="/icon-192.png" alt="" width={32} height={32} className="rounded-md" />
+          <Image src="/logo.png" alt="" width={34} height={34} priority />
           <span className="font-display text-lg leading-none">
             <span className="text-accent">Jan</span>
             <span className="text-success">Setu</span>

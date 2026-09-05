@@ -33,14 +33,11 @@ export function Hero({ problemCount, districtCount, institutionCount, stateCount
     <section className="border-b border-border bg-surface">
       <div className="mx-auto w-full max-w-5xl px-4 py-16 sm:px-6 sm:py-24">
         <div className="flex items-center gap-3">
-          <Image
-            src="/icon-192.png"
-            alt=""
-            width={44}
-            height={44}
-            className="rounded-lg"
-            priority
-          />
+          {/* The emblem, not the app icon: the icon is cropped and padded for a
+              home screen, this is the mark itself. Decorative here — the
+              wordmark beside it already names the service, so an alt text would
+              only be read out twice. */}
+          <Image src="/logo.png" alt="" width={52} height={52} priority />
           <div>
             <p className="font-display text-xl leading-none">
               <span className="text-accent">Jan</span>

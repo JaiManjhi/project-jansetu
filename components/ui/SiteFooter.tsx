@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 
 /**
  * Site footer.
@@ -20,10 +21,13 @@ export function SiteFooter() {
       <div className="mx-auto w-full max-w-6xl px-4 py-12 sm:px-6">
         <div className="grid gap-10 sm:grid-cols-3">
           <div>
-            <p className="font-display text-lg leading-none">
-              <span className="text-accent">Jan</span>
-              <span className="text-success">Setu</span>
-            </p>
+            <div className="flex items-center gap-2.5">
+              <Image src="/logo.png" alt="" width={30} height={30} />
+              <p className="font-display text-lg leading-none">
+                <span className="text-accent">Jan</span>
+                <span className="text-success">Setu</span>
+              </p>
+            </div>
             <p className="mt-3 max-w-xs text-sm text-ink-600">
               Citizens report local problems. Universities with the right expertise take them on.
               Industry backs the work.
