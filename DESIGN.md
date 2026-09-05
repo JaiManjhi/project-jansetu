@@ -4,6 +4,22 @@
 
 The reference points are Stripe, Linear, Notion, Arc Browser, Raycast — restrained, confident, typography-led interfaces that never lean on decoration to look finished. This is a government-facing civic platform, so it must also read as credible and calm, not like a startup landing page.
 
+> **Photography — added 2026-09-06.** The ban below targets *stock illustration
+> of generic diverse people shaking hands*, which is decoration standing in for
+> content. It was read too broadly at first and taken to rule out photography
+> altogether.
+>
+> Documentary photography of civic subjects is permitted, under three rules: it
+> must show **infrastructure or place, not posed people**; it must be **specific
+> to the region** rather than anonymous stock; and where an image is
+> **AI-generated it is illustrative, never presented as evidence** of a
+> particular location or report. A citizen's own uploaded photo is evidence and
+> is treated differently — it is never decorative.
+>
+> The landing hero is one such image: a rural bridge in Jharkhand. A *setu* is
+> the product's own metaphor, so the image carries the idea rather than filling
+> space.
+
 **Explicitly banned:** gradient backgrounds as decoration, glassmorphism, emoji used as icons, stock illustration of generic diverse people shaking hands, a generic centered-hero-with-blob-shapes layout, purple-to-blue gradient buttons, any visual pattern that reads as "default AI-generated SaaS site."
 
 ## 2. Color

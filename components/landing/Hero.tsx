@@ -84,11 +84,35 @@ export function Hero({ problemCount, districtCount, institutionCount, stateCount
         </p>
 
         {/*
+          A setu — a bridge — is the product's own metaphor, so the one image on
+          this page carries the idea rather than filling space. Documentary
+          treatment, infrastructure not posed people, and specific to Jharkhand:
+          the three rules DESIGN.md §1 sets for photography.
+
+          ⚠ AI-generated, and illustrative only. It is not a photograph of a
+          real reported location, and nothing on the page claims it is. Replace
+          it with a real photograph the moment one is available.
+
+          Not priority-loaded: the headline and the report button are what the
+          page is for, and this sits below both.
+        */}
+        <div className="mt-14 overflow-hidden rounded-card border border-border">
+          <Image
+            src="/hero-bridge.jpg"
+            alt="A rural road bridge crossing a river in Jharkhand, with hills and a village behind it."
+            width={1376}
+            height={768}
+            sizes="(max-width: 640px) 100vw, 1024px"
+            className="h-auto w-full object-cover"
+          />
+        </div>
+
+        {/*
           Real figures, read from the database at request time. A landing page
           that states numbers it cannot substantiate is the first thing a judge
           will test, and these are the same counts the admin dashboard shows.
         */}
-        <dl className="mt-16 grid grid-cols-2 gap-px border border-border bg-border sm:grid-cols-4">
+        <dl className="mt-12 grid grid-cols-2 gap-px border border-border bg-border sm:grid-cols-4">
           {[
             { label: "Reports received", value: problemCount },
             { label: "Districts covered", value: districtCount },
