@@ -192,7 +192,12 @@ export default async function FeedPage({
                 {isAdmin && (
                   <ModerationControl
                     problemId={p._id.toString()}
-                    removed={p.removedAt !== null}
+                    // Boolean(), not `!== null`. A report created before this
+                    // field existed has no `removedAt` at all, so the value is
+                    // `undefined` — and `undefined !== null` is true, which
+                    // marked all 16 pre-existing reports as removed and hid the
+                    // Remove button behind a Restore button on every one.
+                    removed={Boolean(p.removedAt)}
                     removedReason={p.removedReason}
                   />
                 )}

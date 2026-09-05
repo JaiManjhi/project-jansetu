@@ -99,7 +99,9 @@ export function ModerationControl({ problemId, removed, removedReason }: Moderat
           className="inline-flex items-center gap-1.5 text-sm text-ink-300 transition-colors hover:text-warning"
         >
           <ShieldOff size={15} strokeWidth={1.5} aria-hidden />
-          Remove
+          {/* Ellipsis: this opens a reason chooser, it does not remove on its
+              own. Without it the first click looks like it did nothing. */}
+          Remove…
         </button>
       ) : (
         <div className="border border-border bg-surface p-3">

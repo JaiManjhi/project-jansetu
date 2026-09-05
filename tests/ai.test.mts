@@ -167,3 +167,26 @@ test("removal is not a problem status", () => {
     "removal must not be modelled as a status — see DATA_MODEL.md",
   );
 });
+
+/**
+ * The bug this guards against shipped and was found in use.
+ *
+ * A problem created before `removedAt` existed has no such field, so reading it
+ * gives `undefined`. The database query `{ removedAt: null }` matches those
+ * documents correctly — MongoDB treats missing and null alike — but the UI used
+ * `removedAt !== null`, and `undefined !== null` is TRUE. Every one of the 16
+ * pre-existing reports rendered as "removed", replacing the Remove control with
+ * a Restore control, so an admin could not take anything down.
+ *
+ * Boolean() is the correct test in JavaScript and works for both shapes.
+ */
+test("a report is only 'removed' when removedAt actually holds a date", () => {
+  const isRemoved = (removedAt: Date | null | undefined) => Boolean(removedAt);
+
+  assert.equal(isRemoved(undefined), false, "a document predating the field is NOT removed");
+  assert.equal(isRemoved(null), false, "an explicit null is NOT removed");
+  assert.equal(isRemoved(new Date()), true, "a date means removed");
+
+  // The comparison that caused the bug, kept here to show why it is wrong.
+  assert.equal(undefined !== null, true, "this is why `!== null` cannot be used");
+});

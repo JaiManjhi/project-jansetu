@@ -94,7 +94,9 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
    */
   return NextResponse.json({
     problemId: problem._id.toString(),
-    removed: problem.removedAt !== null,
+    // Boolean(), not `!== null` — see the feed. A document predating this
+    // field reads as `undefined`, which is not `null` but is not removed.
+    removed: Boolean(problem.removedAt),
     removedReason: problem.removedReason,
     status: problem.status,
   });
