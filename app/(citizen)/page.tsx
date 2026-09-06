@@ -4,6 +4,8 @@ import { Institution } from "@/models/Institution";
 import { VISIBLE_PROBLEM_FILTER } from "@/lib/constants";
 import { Hero } from "@/components/landing/Hero";
 import { HowItWorks } from "@/components/landing/HowItWorks";
+import { StatsBand } from "@/components/landing/StatsBand";
+import { RoutingFeature } from "@/components/landing/RoutingFeature";
 import { ForWhom } from "@/components/landing/ForWhom";
 import { ReportForm } from "@/components/citizen/ReportForm";
 
@@ -56,7 +58,9 @@ export default async function HomePage() {
   return (
     <main className="flex-1">
       <Hero {...figures} />
+      <StatsBand {...figures} />
       <HowItWorks />
+      <RoutingFeature />
 
       {/* scroll-mt keeps the heading clear of the sticky site header when the
           hero's "Report a problem" jumps here. */}

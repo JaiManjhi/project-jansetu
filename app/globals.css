@@ -58,6 +58,13 @@
   /* §4 Spacing — 4px base. Steps: 4,8,12,16,24,32,48,64,96 */
   --spacing: 0.25rem;
 
+  /* §5 Elevation — soft resting shadows, added 2026-09-07 with the direction
+     change in DESIGN.md §1. Deliberately shallow: these lift a card off the
+     page, they are not decoration. */
+  --shadow-card: 0 1px 2px rgb(20 21 26 / 0.04), 0 4px 12px rgb(20 21 26 / 0.05);
+  --shadow-card-hover: 0 2px 4px rgb(20 21 26 / 0.06), 0 8px 24px rgb(20 21 26 / 0.08);
+  --shadow-float: 0 4px 8px rgb(20 21 26 / 0.06), 0 16px 40px rgb(20 21 26 / 0.12);
+
   /* §5 Components — cards 12px, buttons 8px */
   --radius-card: 0.75rem;
   --radius-button: 0.5rem;

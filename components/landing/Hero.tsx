@@ -1,127 +1,108 @@
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowDown, ArrowRight } from "lucide-react";
+import { ArrowRight, ArrowDown, MicOff, WifiOff, Languages, TrendingUp } from "lucide-react";
 
 /**
- * Landing hero — DESIGN.md §1.
+ * Landing hero — DESIGN.md §1, rebuilt after the 2026-09-07 direction change.
  *
- * The banned list rules out most of what a landing page usually reaches for:
- * no gradient ground, no glassmorphism, no blob shapes, no stock illustration
- * of people shaking hands. What is left is what the reference points
- * (Stripe, Linear) actually rely on — type, spacing, and one real idea.
+ * The previous version stacked a headline, a paragraph and an image down a
+ * narrow column, leaving roughly 40% of the viewport empty beside it and
+ * pushing the one photograph below the fold. It was flat rather than restrained.
  *
- * The idea here is the sentence itself. A citizen does not need to be sold a
- * platform; they need to understand in one line that describing a problem sends
- * it to someone who can work on it. So the headline carries the whole product
- * and everything else on the screen is subordinate to it.
- *
- * The Government of India ownership line sits in the masthead rather than only
- * in the footer, which is what GIGW 3.0 asks of a government service: ownership
- * must be identifiable on the homepage and every important entry page.
+ * This is a split composition: the argument on the left, the place it is about
+ * on the right, both above the fold. The image carries a floating figure card
+ * because a number sitting on a photograph is read, and the same number in a
+ * paragraph is skipped.
  */
 
 interface HeroProps {
-  /** Real figures from the database — never invented, see LiveStats. */
   problemCount: number;
   districtCount: number;
   institutionCount: number;
   stateCount: number;
 }
 
-export function Hero({ problemCount, districtCount, institutionCount, stateCount }: HeroProps) {
+const TRUST = [
+  { icon: MicOff, label: "No login needed" },
+  { icon: WifiOff, label: "Works offline" },
+  { icon: Languages, label: "5 languages" },
+];
+
+export function Hero({ institutionCount }: HeroProps) {
   return (
     <section className="border-b border-border bg-surface">
-      <div className="mx-auto w-full max-w-5xl px-4 py-16 sm:px-6 sm:py-24">
-        <div className="flex items-center gap-3">
-          {/* The emblem, not the app icon: the icon is cropped and padded for a
-              home screen, this is the mark itself. Decorative here — the
-              wordmark beside it already names the service, so an alt text would
-              only be read out twice. */}
-          <Image src="/logo.png" alt="" width={52} height={52} priority />
-          <div>
-            <p className="font-display text-xl leading-none">
-              <span className="text-accent">Jan</span>
-              <span className="text-success">Setu</span>
-            </p>
-            <p className="mt-1 text-xs tracking-wide text-ink-300 uppercase">
-              Government of Jharkhand · SIH26043
-            </p>
+      <div className="mx-auto grid w-full max-w-6xl items-center gap-12 px-4 py-16 sm:px-6 lg:grid-cols-[1.05fr_1fr] lg:gap-16 lg:py-24">
+        <div>
+          <p className="inline-flex items-center gap-2 rounded-full border border-border bg-accent-subtle px-3 py-1.5 text-xs font-semibold tracking-wide text-accent uppercase">
+            SIH26043 · Smart India Hackathon
+          </p>
+
+          <h1 className="font-display mt-6 text-2xl leading-tight text-balance text-ink-900 sm:text-3xl">
+            Tell us what is broken near you.
+          </h1>
+
+          <p className="mt-5 max-w-xl text-base text-ink-600">
+            Describe it in your own words — type or speak. We check whether your neighbours already
+            reported it, then send it to the university department best equipped to fix it.
+          </p>
+
+          <div className="mt-8 flex flex-wrap items-center gap-3">
+            <a
+              href="#report"
+              className="inline-flex min-h-touch items-center gap-2 rounded-button bg-accent px-6 text-base font-semibold text-white shadow-[var(--shadow-card)] transition-colors hover:bg-accent-deep"
+            >
+              Report a problem
+              <ArrowDown size={18} strokeWidth={2.25} aria-hidden />
+            </a>
+            <Link
+              href="/feed"
+              className="inline-flex min-h-touch items-center gap-2 rounded-button border border-border bg-surface px-6 text-base font-semibold text-ink-900 transition-colors hover:border-accent hover:text-accent"
+            >
+              Browse reports
+              <ArrowRight size={18} strokeWidth={2.25} aria-hidden />
+            </Link>
+          </div>
+
+          <ul className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3 border-t border-border pt-6">
+            {TRUST.map(({ icon: Icon, label }) => (
+              <li key={label} className="flex items-center gap-2 text-sm text-ink-600">
+                <Icon size={16} strokeWidth={1.75} className="text-accent" aria-hidden />
+                {label}
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/*
+          The photograph and the figure over it. Ordered second in the DOM so a
+          screen reader and a narrow screen both reach the headline and the
+          report button before the decoration.
+        */}
+        <div className="relative">
+          <div className="overflow-hidden rounded-card border border-border shadow-[var(--shadow-float)]">
+            <Image
+              src="/hero-bridge.jpg"
+              alt="A rural road bridge crossing a river in Jharkhand, with hills and a village behind it."
+              width={1376}
+              height={768}
+              sizes="(max-width: 1024px) 100vw, 560px"
+              className="h-full w-full object-cover"
+              priority
+            />
+          </div>
+
+          <div className="absolute -bottom-5 left-5 flex items-center gap-3 rounded-card border border-border bg-surface px-4 py-3 shadow-[var(--shadow-float)]">
+            <span className="flex size-9 shrink-0 items-center justify-center rounded-button bg-success/10">
+              <TrendingUp size={18} strokeWidth={2} className="text-success" aria-hidden />
+            </span>
+            <span>
+              <span className="block text-base font-semibold text-ink-900 tabular-nums">
+                {institutionCount} institutions
+              </span>
+              <span className="block text-xs text-ink-600">ready to take work on</span>
+            </span>
           </div>
         </div>
-
-        <h1 className="font-display mt-10 max-w-3xl text-2xl leading-tight text-balance text-ink-900 sm:text-3xl">
-          Tell us what is broken near you. We find the people who can fix it.
-        </h1>
-
-        <p className="mt-6 max-w-xl text-base text-ink-600">
-          Describe a local problem in your own words — type it, or just speak. JanSetu reads it,
-          checks whether your neighbours have already reported the same thing, and sends it to the
-          university department best equipped to work on it.
-        </p>
-
-        <div className="mt-10 flex flex-wrap items-center gap-4">
-          <a
-            href="#report"
-            className="inline-flex min-h-touch items-center gap-2 rounded-button bg-accent px-6 text-base font-medium text-white transition-colors hover:bg-accent-deep"
-          >
-            Report a problem
-            <ArrowDown size={18} strokeWidth={2} aria-hidden />
-          </a>
-          <Link
-            href="/feed"
-            className="inline-flex min-h-touch items-center gap-2 rounded-button border border-border px-6 text-base font-medium text-ink-900 transition-colors hover:border-accent hover:text-accent"
-          >
-            See what people are reporting
-            <ArrowRight size={18} strokeWidth={2} aria-hidden />
-          </Link>
-        </div>
-
-        <p className="mt-4 text-sm text-ink-600">
-          No account needed. Reporting takes about a minute.
-        </p>
-
-        {/*
-          A setu — a bridge — is the product's own metaphor, so the one image on
-          this page carries the idea rather than filling space. Documentary
-          treatment, infrastructure not posed people, and specific to Jharkhand:
-          the three rules DESIGN.md §1 sets for photography.
-
-          ⚠ AI-generated, and illustrative only. It is not a photograph of a
-          real reported location, and nothing on the page claims it is. Replace
-          it with a real photograph the moment one is available.
-
-          Not priority-loaded: the headline and the report button are what the
-          page is for, and this sits below both.
-        */}
-        <div className="mt-14 overflow-hidden rounded-card border border-border">
-          <Image
-            src="/hero-bridge.jpg"
-            alt="A rural road bridge crossing a river in Jharkhand, with hills and a village behind it."
-            width={1376}
-            height={768}
-            sizes="(max-width: 640px) 100vw, 1024px"
-            className="h-auto w-full object-cover"
-          />
-        </div>
-
-        {/*
-          Real figures, read from the database at request time. A landing page
-          that states numbers it cannot substantiate is the first thing a judge
-          will test, and these are the same counts the admin dashboard shows.
-        */}
-        <dl className="mt-12 grid grid-cols-2 gap-px border border-border bg-border sm:grid-cols-4">
-          {[
-            { label: "Reports received", value: problemCount },
-            { label: "Districts covered", value: districtCount },
-            { label: "Institutions listed", value: institutionCount },
-            { label: "States", value: stateCount },
-          ].map((stat) => (
-            <div key={stat.label} className="bg-surface px-5 py-5">
-              <dd className="font-display text-xl text-accent tabular-nums">{stat.value}</dd>
-              <dt className="mt-1 text-sm text-ink-600">{stat.label}</dt>
-            </div>
-          ))}
-        </dl>
       </div>
     </section>
   );

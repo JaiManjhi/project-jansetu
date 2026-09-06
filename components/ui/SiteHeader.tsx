@@ -68,7 +68,12 @@ export async function SiteHeader() {
           {user ? (
             <SignOutButton />
           ) : (
-            <Link href="/login" className="text-ink-600 transition-colors hover:text-accent">
+            /* A solid button, not a link. Signing in is the only action in this
+               bar and it was reading as one more piece of navigation. */
+            <Link
+              href="/login"
+              className="inline-flex min-h-9 items-center rounded-button bg-accent px-4 text-sm font-semibold text-white transition-colors hover:bg-accent-deep"
+            >
               Sign in
             </Link>
           )}

@@ -2,79 +2,80 @@ import Link from "next/link";
 import Image from "next/image";
 
 /**
- * Site footer.
+ * Site footer — dark navy, per the 2026-09-07 direction change.
+ *
+ * A solid ground does real work here beyond looking finished: it closes the
+ * page. The previous white footer ran into the white section above it, so the
+ * page appeared to stop rather than end.
  *
  * GIGW 3.0 asks a government service to state its ownership, its accessibility
- * position and how to reach it. Most of what belongs here does not exist yet —
- * there is no grievance officer, no RTI page, no privacy policy — and inventing
- * links to pages that are not there would be worse than saying so.
- *
- * So this footer states what is true, including the parts that are unflattering:
- * that this is a hackathon prototype, that pledges are intentions rather than
- * transactions, and that no money moves through the platform. A judge reading it
- * learns exactly where the boundary of the build is.
+ * position and how to reach it. Most of what belongs in a real government
+ * footer does not exist yet — no grievance officer, no RTI page, no privacy
+ * policy — and linking to pages that are not there would be worse than saying
+ * so. The generated design this layout came from offered Privacy and Terms
+ * links; both would have 404'd.
  */
+
+const EXPLORE = [
+  { href: "/", label: "Report a problem" },
+  { href: "/feed", label: "What people are reporting" },
+  { href: "/track", label: "Follow a report" },
+  { href: "/login", label: "Institution & partner sign in" },
+];
 
 export function SiteFooter() {
   return (
-    <footer className="border-t border-border bg-surface">
-      <div className="mx-auto w-full max-w-6xl px-4 py-12 sm:px-6">
+    <footer className="bg-accent-deep">
+      <div className="mx-auto w-full max-w-6xl px-4 py-14 sm:px-6">
         <div className="grid gap-10 sm:grid-cols-3">
           <div>
             <div className="flex items-center gap-2.5">
-              <Image src="/logo.png" alt="" width={30} height={30} />
-              <p className="font-display text-lg leading-none">
-                <span className="text-accent">Jan</span>
-                <span className="text-success">Setu</span>
-              </p>
+              {/* The emblem sits on a white tile here — the mark carries white
+                  bridge cables that would disappear against the navy ground. */}
+              <span className="flex size-9 items-center justify-center rounded-button bg-white">
+                <Image src="/logo.png" alt="" width={28} height={28} />
+              </span>
+              <p className="font-display text-lg leading-none text-white">JanSetu</p>
             </div>
-            <p className="mt-3 max-w-xs text-sm text-ink-600">
+            <p className="mt-4 max-w-xs text-sm text-white/70">
               Citizens report local problems. Universities with the right expertise take them on.
               Industry backs the work.
             </p>
           </div>
 
           <div>
-            <h2 className="text-xs tracking-wide text-ink-300 uppercase">Explore</h2>
-            <ul className="mt-3 grid gap-2 text-sm">
-              <li>
-                <Link href="/" className="text-ink-600 hover:text-accent">
-                  Report a problem
-                </Link>
-              </li>
-              <li>
-                <Link href="/feed" className="text-ink-600 hover:text-accent">
-                  What people are reporting
-                </Link>
-              </li>
-              <li>
-                <Link href="/track" className="text-ink-600 hover:text-accent">
-                  Follow a report
-                </Link>
-              </li>
-              <li>
-                <Link href="/login" className="text-ink-600 hover:text-accent">
-                  Institution &amp; partner sign in
-                </Link>
-              </li>
+            <h2 className="text-xs font-semibold tracking-wide text-white/50 uppercase">Explore</h2>
+            <ul className="mt-4 grid gap-3 text-sm">
+              {EXPLORE.map((item) => (
+                <li key={item.href + item.label}>
+                  <Link
+                    href={item.href}
+                    className="text-white/80 transition-colors hover:text-white"
+                  >
+                    {item.label}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
 
           <div>
-            <h2 className="text-xs tracking-wide text-ink-300 uppercase">Accessibility</h2>
-            <p className="mt-3 text-sm text-ink-600">
+            <h2 className="text-xs font-semibold tracking-wide text-white/50 uppercase">
+              Accessibility
+            </h2>
+            <p className="mt-4 text-sm text-white/70">
               Built to WCAG 2.1 Level AA colour contrast, keyboard navigable, and readable in
               English, हिंदी, বাংলা, मराठी and ଓଡ଼ିଆ.
             </p>
           </div>
         </div>
 
-        <div className="mt-10 border-t border-border pt-6">
-          <p className="text-sm text-ink-600">
+        <div className="mt-12 border-t border-white/15 pt-6">
+          <p className="text-sm text-white/70">
             A Government of Jharkhand initiative, built for Smart India Hackathon problem statement
             SIH26043.
           </p>
-          <p className="mt-2 text-sm text-ink-300">
+          <p className="mt-2 text-sm text-white/45">
             Prototype. Pledges recorded here are statements of intent — no money is taken or
             transferred through this platform.
           </p>

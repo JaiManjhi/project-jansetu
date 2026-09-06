@@ -20,6 +20,31 @@ The reference points are Stripe, Linear, Notion, Arc Browser, Raycast — restra
 > the product's own metaphor, so the image carries the idea rather than filling
 > space.
 
+> **Direction revised — 2026-09-07.** The original brief called for restraint
+> and produced something under-designed rather than restrained. Measured on the
+> live page: a narrow content column with roughly 40% of the viewport empty
+> beside it, the logo repeated twice within 60px, and two buttons on the whole
+> page.
+>
+> (A fourth claim — "an entire blank screen between sections" — was made during
+> the same review and was **wrong**. The browser pane's screenshots intermittently
+> capture blank frames; measuring the DOM showed the sections were contiguous and
+> fully populated. Recorded here because the same artifact had already caused one
+> false alarm about the map, and it will cause another.)
+>
+> Restraint is not the absence of design. Stripe and Linear — the references §1
+> names — use strong composition, real elevation, imagery and unmistakable
+> buttons. What shipped had the flatness without the craft.
+>
+> **What changes:** cards carry a soft resting shadow; sections alternate ground
+> colour and use the full page width; the hero is a split composition rather than
+> stacked text; every consequential action is a button.
+>
+> **What does not change:** the ban list below still holds in full. No gradient
+> grounds, no glassmorphism, no emoji as icons, no stock illustration of people,
+> no blob shapes. Depth here means a 1-2% shadow that lifts a card off the page,
+> not decoration.
+
 **Explicitly banned:** gradient backgrounds as decoration, glassmorphism, emoji used as icons, stock illustration of generic diverse people shaking hands, a generic centered-hero-with-blob-shapes layout, purple-to-blue gradient buttons, any visual pattern that reads as "default AI-generated SaaS site."
 
 ## 2. Color
@@ -105,7 +130,8 @@ Dark mode: invert to an ink-950 background (`#0E0F13`), not pure black. Ship dar
 
 ## 5. Components
 
-- **Cards:** `--surface` background, 1px `--border`, 12px corner radius, no shadow at rest — a subtle shadow only on hover/interactive cards. Flat, not floaty.
+- **Cards:** `--surface` background, 1px `--border`, 12px corner radius, and a soft resting shadow (`--shadow-card`). Elevated, not flat — see the amendment below.
+- **Buttons:** every consequential action is a real button with a solid or outlined shape and a visible hit area. A bare text link is only acceptable for genuinely secondary navigation. This is a rule because the first build broke it everywhere: the entire landing page had two buttons and everything else was underlined text, which read as unimportant.
 - **Buttons:** solid `--accent` for primary, outline `--border` for secondary, no gradient fills ever. 8px corner radius.
 - **Forms:** generous input height (44px minimum, touch-target friendly — citizens are on phones), visible focus rings in `--accent`, inline validation, not just on-submit.
 - **Empty states:** a short, specific sentence + one clear action. No stock illustration.
