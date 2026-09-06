@@ -1,7 +1,8 @@
 "use client";
 
 import { motion } from "motion/react";
-import { CheckCircle2, GitMerge, Clock } from "lucide-react";
+import Link from "next/link";
+import { CheckCircle2, GitMerge, Clock, ArrowRight } from "lucide-react";
 
 /**
  * The response moment. Three shapes, per API_SPEC.md.
@@ -88,7 +89,7 @@ export function SubmissionResult({
           </p>
         </motion.div>
 
-        <Actions onReset={onReset} />
+        <Actions onReset={onReset} problemId={result.duplicate.problemId} />
       </motion.div>
     );
   }
@@ -132,21 +133,43 @@ export function SubmissionResult({
         </div>
       </dl>
 
-      <Actions onReset={onReset} />
+      <Actions onReset={onReset} problemId={result.problemId} />
     </div>
   );
 }
 
-function Actions({ onReset }: { onReset: () => void }) {
+function Actions({ onReset, problemId }: { onReset: () => void; problemId: string }) {
   return (
-    <div className="mt-6 flex flex-wrap gap-3">
-      <button
-        type="button"
-        onClick={onReset}
-        className="inline-flex min-h-touch items-center rounded-button bg-accent px-5 text-base font-medium text-white transition-colors hover:bg-accent-deep"
-      >
-        Report another problem
-      </button>
-    </div>
+    <>
+      {/*
+        The reference, shown plainly and selectable.
+
+        There are no accounts, so this string is the citizen's only way back to
+        their report. Burying it would make "know what happened to it" depend on
+        not closing the tab. For a merged report this is the id of the report it
+        was merged into — the one that is actually progressing.
+      */}
+      <div className="mt-6 border-t border-border pt-4">
+        <p className="text-sm text-ink-600">Your reference — keep this to check back:</p>
+        <p className="mt-1 font-mono text-sm break-all text-ink-900 select-all">{problemId}</p>
+      </div>
+
+      <div className="mt-5 flex flex-wrap gap-3">
+        <Link
+          href={`/track/${problemId}`}
+          className="inline-flex min-h-touch items-center gap-2 rounded-button bg-accent px-5 text-base font-medium text-white transition-colors hover:bg-accent-deep"
+        >
+          Track this report
+          <ArrowRight size={18} strokeWidth={2} aria-hidden />
+        </Link>
+        <button
+          type="button"
+          onClick={onReset}
+          className="inline-flex min-h-touch items-center rounded-button border border-border px-5 text-base font-medium text-ink-900 transition-colors hover:border-accent hover:text-accent"
+        >
+          Report another problem
+        </button>
+      </div>
+    </>
   );
 }

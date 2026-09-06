@@ -95,6 +95,22 @@ Rate-limited per IP, since an unauthenticated signing endpoint is otherwise an o
 
 ---
 
+### Citizen tracking pages (no API of their own)
+
+`/track/:id` and `/track` are **server-rendered pages, not API routes**. They read the database directly, the same way the feed does — a server component calling our own HTTP route would add a hop and buy nothing.
+
+`/track/:id` shows one report's progress: a timeline derived from `problems.status`, the institutions it was routed to with their reasons, and the claiming institution's latest note when there is one. `/track` is a reference lookup for someone who kept the code but not the tab.
+
+Three behaviours worth stating, because each is a decision rather than a default:
+
+- **A merged report redirects** to the report it was merged into, carrying `?merged=1`, and the destination explains why the wording changed. A citizen following their own reference must not hit a dead end — PRD §6.
+- **A removed report is a 404**, matching `GET /api/problems/:id`. A tombstone quoting the text would republish what was taken down.
+- **Routing refusal is shown as its own state**, not as "still pending". When nothing cleared `MIN_ROUTING_SCORE` the page says so plainly. Leaving it looking like work in progress would be the easiest place on this screen to mislead.
+
+These pages are public. The id is unguessable, the report is already public in the feed, and requiring a login to follow your own report would contradict not requiring one to file it.
+
+---
+
 ### `PATCH /api/problems/:id/moderation` — **auth: admin**
 Takes a report down, or restores it.
 

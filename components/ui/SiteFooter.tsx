@@ -48,6 +48,11 @@ export function SiteFooter() {
                 </Link>
               </li>
               <li>
+                <Link href="/track" className="text-ink-600 hover:text-accent">
+                  Follow a report
+                </Link>
+              </li>
+              <li>
                 <Link href="/login" className="text-ink-600 hover:text-accent">
                   Institution &amp; partner sign in
                 </Link>

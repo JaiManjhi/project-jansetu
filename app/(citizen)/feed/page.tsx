@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 import { connectToDatabase } from "@/lib/db";
 import { Problem } from "@/models/Problem";
 import { UpvoteButton } from "@/components/citizen/UpvoteButton";
@@ -190,6 +191,16 @@ export default async function FeedPage({
               <div className="min-w-0">
                 <p className="text-base text-ink-900">{p.title}</p>
                 <p className="mt-1 line-clamp-2 text-sm text-ink-600">{p.description}</p>
+                {/* The way in to the tracker for anyone who did not keep their
+                    reference — the feed is the only other route back to a
+                    specific report. */}
+                <Link
+                  href={`/track/${p._id.toString()}`}
+                  className="mt-2 inline-flex items-center gap-1 text-sm font-medium text-accent underline-offset-4 hover:underline"
+                >
+                  See status
+                  <ArrowRight size={14} strokeWidth={2} aria-hidden />
+                </Link>
                 <TranslateControl
                   problemId={p._id.toString()}
                   sourceLanguage={p.language}
